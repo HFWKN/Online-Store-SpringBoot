@@ -1,0 +1,29 @@
+server:
+  port: 10010
+
+spring:
+  profiles:
+    active: local
+  application:
+    name: store-gateway
+  cloud:
+    nacos:
+      server-addr: 192.168.100.128:8848
+      discovery:
+        namespace: dev
+        group: DEFAULT_GROUP
+      config:
+        namespace: dev
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        shared-configs:
+          - data-id: shared-redis.yaml
+            refresh: true
+          - data-id: shared-common.yaml
+            refresh: false
+          - data-id: shared-log.yaml
+            refresh: false
+
+logging:
+  level:
+    com.liubingqi: debug
