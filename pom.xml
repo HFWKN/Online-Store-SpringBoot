@@ -21,6 +21,7 @@
         <module>store-gateway</module>
         <module>store-auth</module>
         <module>store-product</module>
+        <module>store-cart</module>
         <module>store-order</module>
         <module>store-seckill</module>
     </modules>
