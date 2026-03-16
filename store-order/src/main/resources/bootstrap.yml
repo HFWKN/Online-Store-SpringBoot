@@ -10,10 +10,10 @@ spring:
     nacos:
       server-addr: 192.168.100.128:8848
       discovery:
-        namespace: dev
+        namespace: 1678c303-78be-43b0-841f-6122c97ac5e1
         group: DEFAULT_GROUP
       config:
-        namespace: dev
+        namespace: 1678c303-78be-43b0-841f-6122c97ac5e1
         group: DEFAULT_GROUP
         file-extension: yaml
         shared-configs:
