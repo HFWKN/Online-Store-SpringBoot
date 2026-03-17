@@ -1,0 +1,10 @@
+# Knife4j 配置
+knife4j:
+  enable: true
+  openapi:
+    title: 在线商城微服务API
+    description: 高并发秒杀商城系统接口文档
+    version: 1.0.0
+    concat: liubingqi
+  setting:
+    language: zh_cn
