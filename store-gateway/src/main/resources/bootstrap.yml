@@ -23,6 +23,61 @@ spring:
             refresh: false
           - data-id: shared-log.yaml
             refresh: false
+         # - data-id: gateway-routes.yaml  # 你在Nacos中的网关配置文件名
+          #  refresh: true   如果使用nacos配置，则先把nacos里的网关配置更新，然后解除掉注释
+    gateway:
+      routes:
+        # 认证服务路由 - 用户相关接口
+        - id: store-auth
+          uri: lb://store-auth
+          predicates:
+            - Path=/user/**
+          filters:
+            - StripPrefix=0
+        # 商品服务路由
+        - id: store-product
+          uri: lb://store-product
+          predicates:
+            - Path=/product/**
+          filters:
+            - StripPrefix=0
+        # 购物车服务路由
+        - id: store-cart
+          uri: lb://store-cart
+          predicates:
+            - Path=/cart/**
+          filters:
+            - StripPrefix=0
+        # 订单服务路由 - 订单相关接口
+        - id: store-order-main
+          uri: lb://store-order
+          predicates:
+            - Path=/order/**
+          filters:
+            - StripPrefix=0
+        # 订单服务路由 - 订单项相关接口
+        - id: store-order-item
+          uri: lb://store-order
+          predicates:
+            - Path=/order-item/**
+          filters:
+            - StripPrefix=0
+        # 秒杀服务路由 - 库存相关接口
+        - id: store-seckill
+          uri: lb://store-seckill
+          predicates:
+            - Path=/stock/**
+          filters:
+            - StripPrefix=0
+      # 全局跨域配置
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOriginPatterns: "*"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+            maxAge: 3600
 
 logging:
   level:

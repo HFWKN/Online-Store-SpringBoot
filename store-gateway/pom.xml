@@ -72,6 +72,12 @@
             <artifactId>hutool-all</artifactId>
         </dependency>
 
+        <!-- OpenFeign (为了支持common模块中的FeignRequestInterceptor) -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

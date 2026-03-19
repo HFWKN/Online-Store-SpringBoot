@@ -83,6 +83,13 @@
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
 
+        <!-- OpenFeign -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Knife4j API文档 (兼容Spring Boot 3.x) -->
         <dependency>
             <groupId>com.github.xiaoymin</groupId>
