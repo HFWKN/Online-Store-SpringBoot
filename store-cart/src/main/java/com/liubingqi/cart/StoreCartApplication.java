@@ -5,6 +5,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.ComponentScan;
 
 /**
  * 购物车服务启动类
@@ -14,6 +15,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableDiscoveryClient
 @EnableFeignClients
 @MapperScan("com.liubingqi.cart.mapper")
+@ComponentScan(basePackages = {"com.liubingqi.common", "com.liubingqi.cart"})
 public class StoreCartApplication {
 
     public static void main(String[] args) {

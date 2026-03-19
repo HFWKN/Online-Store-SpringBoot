@@ -37,12 +37,12 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     // 白名单路径，不需要token验证
     private static final List<String> WHITE_LIST = List.of(
-            "/user/login",
-            "/user/register", 
-            "/user/captcha",
+            "/auth/user/login",
+            "/auth/user/register", 
+            "/auth/user/captcha",
             "/product/list",
-            "/product/detail",
-            "/product/page"
+            "/product/detail"
+            //"/product/page"
     );
 
     @Override
@@ -82,7 +82,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             // 将用户信息传递给下游服务
             ServerHttpRequest modifiedRequest = request.mutate()
                     .header("X-User-Id", String.valueOf(userId))
-                    .header("X-User-Name", username)
+                    .header("X-Username", username)
                     .build();
 
             // 放行
@@ -95,7 +95,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
     }
 
     /**
-     * 判断是否是白名单路径（循环判断）
+     * 判断是否是白名单路径
      */
     private boolean isWhitePath(String path) {
         for (String whitePattern : WHITE_LIST) {

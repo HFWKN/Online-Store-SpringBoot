@@ -26,6 +26,7 @@ import lombok.experimental.Accessors;
 @Schema(name = "Product对象", description = "商品基本信息表")
 public class Product implements Serializable {
 
+    // 默认序列化版本号
     private static final long serialVersionUID = 1L;
 
     @Schema(description = "商品ID")
@@ -52,6 +53,12 @@ public class Product implements Serializable {
 
     @Schema(description = "上架状态: 0-下架, 1-上架")
     private Integer status;
+
+    @Schema(description = "所属公司id")
+    private String companyId;
+
+    @Schema(description = "所属公司name")
+    private String companyName;
 
     private LocalDateTime createdAt;
 
