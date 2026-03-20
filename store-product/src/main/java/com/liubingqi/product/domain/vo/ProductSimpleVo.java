@@ -33,8 +33,8 @@ public class ProductSimpleVo {
     @Schema(description = "上架状态: 0-下架, 1-上架")
     private Integer status;
 
-    @Schema(description = "状态描述")
-    private String statusDesc;
+/*    @Schema(description = "状态描述")
+    private String statusDesc;*/
 
     @Schema(description = "所属公司id")
     private String companyId;

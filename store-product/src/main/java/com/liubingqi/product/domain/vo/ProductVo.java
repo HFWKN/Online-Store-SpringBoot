@@ -34,6 +34,9 @@ public class ProductVo {
     @Schema(description = "分类ID")
     private Long categoryId;
 
+    @Schema(description = "分类name")
+    private Long categoryName;
+
     @Schema(description = "上架状态: 0-下架, 1-上架")
     private Integer status;
 
@@ -41,10 +44,10 @@ public class ProductVo {
     private String statusDesc;
 
     @Schema(description = "所属公司id")
-    private String company_id;
+    private String companyId;
 
     @Schema(description = "所属公司name")
-    private String company_name;
+    private String companyName;
 
     @Schema(description = "创建时间")
     private LocalDateTime createdAt;

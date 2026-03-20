@@ -8,12 +8,14 @@ import com.liubingqi.product.domain.page.PageQueryByProduct;
 import com.liubingqi.product.domain.po.Product;
 import com.liubingqi.product.domain.vo.ProductSimpleVo;
 import com.liubingqi.product.domain.vo.ProductVo;
+import com.liubingqi.product.domain.vo.ProductWithCommentVo;
 import com.liubingqi.product.service.IProductService;
 import com.liubingqi.product.service.impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
@@ -48,5 +50,15 @@ public class ProductController {
         return Result.success(list);
     }
 
-
+    /**
+     *  查询商品详情页
+     * @param productId
+     * @return
+     */
+    @GetMapping("/detailed/{productId}")
+    @Operation(summary = "商品详情")
+    public Result<ProductWithCommentVo> detailed(@PathVariable Integer productId){
+        ProductWithCommentVo vo = productService.detailed(productId);
+        return Result.success(vo);
+    }
 }

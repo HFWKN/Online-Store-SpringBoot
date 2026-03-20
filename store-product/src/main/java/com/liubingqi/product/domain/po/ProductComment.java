@@ -72,6 +72,11 @@ public class ProductComment implements Serializable {
     private Integer starRating;
 
     /**
+     *  是否隐藏（1隐藏  0未隐藏）
+     */
+    private Integer status;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

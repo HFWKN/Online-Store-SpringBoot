@@ -30,6 +30,10 @@ public class PageQueryByProduct extends PageQuery {
     @Schema(description = "最高价格", example = "999999")
     private BigDecimal maxPrice;
 
+    // 按升序还是降序
+    @Schema(description = "排序(1：升序/2：降序)", example = "")
+    private Long sort;
+
 /*    @Schema(description = "所属公司id", example = "COMP001")
     private String company_id;*/
 }
