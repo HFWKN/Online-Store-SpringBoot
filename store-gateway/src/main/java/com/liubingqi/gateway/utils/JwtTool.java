@@ -19,13 +19,6 @@ import java.util.Date;
 @Component
 public class JwtTool {
 
-    private final JWTSigner jwtSigner;
-
-    public JwtTool() {
-        // 使用HS256对称加密算法
-        this.jwtSigner = JWTSignerUtil.hs256(JwtConstants.SECRET.getBytes());
-    }
-
     /**
      * 生成JWT令牌
      *
@@ -35,6 +28,7 @@ public class JwtTool {
      */
     public String generateToken(Long userId, String username) {
         try {
+            JWTSigner jwtSigner = createSigner();
             return JWT.create()
                     .setPayload("userId", userId)
                     .setPayload(JwtConstants.USERNAME_CLAIM, username)
@@ -57,6 +51,7 @@ public class JwtTool {
      */
     public JWT parseToken(String token) {
         try {
+            JWTSigner jwtSigner = createSigner();
             // 解析token
             JWT jwt = JWT.of(token).setSigner(jwtSigner);
             
@@ -123,5 +118,9 @@ public class JwtTool {
             throw new RuntimeException("JWT令牌中不包含用户名");
         }
         return username.toString();
+    }
+
+    private JWTSigner createSigner() {
+        return JWTSignerUtil.hs256(JwtConstants.SECRET.getBytes());
     }
 }

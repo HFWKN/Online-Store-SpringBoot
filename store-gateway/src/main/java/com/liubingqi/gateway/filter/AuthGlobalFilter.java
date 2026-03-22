@@ -69,6 +69,7 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
         if (token.startsWith("Bearer ")) {
             token = token.substring(7);
         }
+        log.info(token);
 
         // 校验token
         try {
