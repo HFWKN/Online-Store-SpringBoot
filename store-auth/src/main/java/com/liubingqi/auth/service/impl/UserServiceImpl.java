@@ -113,8 +113,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         user.setNickname(registerRequest.getUsername()); // 默认昵称为用户名
         user.setEmail(registerRequest.getEmail()); // 设置邮箱
         user.setStatus(1); // 正常状态
-        user.setCreatedAt(LocalDateTime.now());
-        user.setUpdatedAt(LocalDateTime.now());
+        user.setCreateTime(LocalDateTime.now());
+        user.setUpdateTime(LocalDateTime.now());
 
         // 4. 保存用户
         boolean result = save(user);

@@ -7,9 +7,7 @@ import com.liubingqi.product.domain.vo.ProductWithCommentVo;
 import com.liubingqi.product.service.IProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/product/detailed")
@@ -22,12 +20,12 @@ public class ProductDetailedController {
 
 
     /**
-     *  商品详情界面
+     *  商品详情界面(不包含规格)
      * @param productId
      * @return
      */
     @GetMapping("/{productId}")
-    public Result<ProductWithCommentVo> detailed(Integer productId){
+    public Result<ProductWithCommentVo> detailedByProduct(@PathVariable Integer productId){
         ProductWithCommentVo detailed = productService.detailed(productId);
         return Result.success(detailed);
     }

@@ -24,7 +24,7 @@ import java.util.List;
  * @since 2026-03-20
  */
 @RestController
-@RequestMapping("/product-comment")
+@RequestMapping("/product/comment")
 @RequiredArgsConstructor
 @Tag(name = "商品评价管理", description = "商品评价相关接口")
 public class ProductCommentController {
@@ -37,7 +37,7 @@ public class ProductCommentController {
      * @param productId
      * @return
      */
-    @GetMapping("/comment/{productId}")
+    @GetMapping("/{productId}")
     @Operation(summary = "根据商品id查询其评论集合")
     public Result<List<ProductComment>> getCommentById(@PathVariable Integer productId){
         return Result.success(productCommentService.getCommentById(productId));

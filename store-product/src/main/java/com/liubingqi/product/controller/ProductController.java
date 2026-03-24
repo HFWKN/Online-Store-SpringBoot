@@ -50,15 +50,15 @@ public class ProductController {
         return Result.success(list);
     }
 
-    /**
+/*    *//**
      *  查询商品详情页
      * @param productId
      * @return
-     */
+     *//*
     @GetMapping("/detailed/{productId}")
     @Operation(summary = "商品详情")
     public Result<ProductWithCommentVo> detailed(@PathVariable Integer productId){
         ProductWithCommentVo vo = productService.detailed(productId);
         return Result.success(vo);
-    }
+    }*/
 }
