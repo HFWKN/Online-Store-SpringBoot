@@ -37,9 +37,9 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
 
     // 白名单路径，不需要token验证
     private static final List<String> WHITE_LIST = List.of(
-            "/auth/user/login",
-            "/auth/user/register", 
-            "/auth/user/captcha",
+            "/user/login",
+            "/user/register",
+            "/user/captcha",
             "/product/list",
             "/product/detail"
             //"/product/page"
