@@ -37,6 +37,11 @@ public class ProductComment implements Serializable {
     private Long userId;
 
     /**
+     *  用户name
+     */
+    private String userName;
+
+    /**
      * 商品ID
      */
     private Long productId;
