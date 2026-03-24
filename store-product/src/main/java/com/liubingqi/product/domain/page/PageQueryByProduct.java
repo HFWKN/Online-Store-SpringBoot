@@ -35,5 +35,5 @@ public class PageQueryByProduct extends PageQuery {
     private Long sort;
 
 /*    @Schema(description = "所属公司id", example = "COMP001")
-    private String company_id;*/
+    private String companyId;*/
 }

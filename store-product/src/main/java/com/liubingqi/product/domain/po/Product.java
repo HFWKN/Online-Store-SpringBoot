@@ -60,9 +60,9 @@ public class Product implements Serializable {
     @Schema(description = "所属公司name")
     private String companyName;
 
-    private LocalDateTime createdTime;
+    private LocalDateTime createTime;
 
-    private LocalDateTime updatedTime;
+    private LocalDateTime updateTime;
 
 
 }

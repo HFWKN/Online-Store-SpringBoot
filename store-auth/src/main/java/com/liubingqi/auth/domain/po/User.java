@@ -50,10 +50,10 @@ public class User implements Serializable {
     private Integer status;
 
     @Schema(description = "创建时间")
-    private LocalDateTime createdAt;
+    private LocalDateTime createTime;
 
     @Schema(description = "更新时间")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updateTime;
 
 
 }

@@ -83,6 +83,6 @@ public class PageQuery {
      * 转换为 MyBatis-Plus 的 Page 对象（默认按创建时间降序）
      */
     public <T> Page<T> toMpPageDefaultSortByCreateTimeDesc() {
-        return toMpPage("created_at", false);
+        return toMpPage("created_time", false);
     }
 }

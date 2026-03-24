@@ -46,9 +46,9 @@ public class Stock implements Serializable {
     @Schema(description = "版本号(乐观锁)")
     private Integer version;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createTime;
 
-    private LocalDateTime updatedAt;
+    private LocalDateTime updateTime;
 
 
 }

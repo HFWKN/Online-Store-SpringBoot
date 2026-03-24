@@ -62,9 +62,9 @@ public class Order implements Serializable {
     @Schema(description = "收货地址")
     private String receiverAddress;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createTime;
 
-    private LocalDateTime updatedAt;
+    private LocalDateTime updateTime;
 
 
 }

@@ -41,8 +41,8 @@ public class ProductDto {
     private Integer status;
 
     @Schema(description = "所属公司id", example = "COMP001")
-    private String company_id;
+    private String companyId;
 
     @Schema(description = "所属公司name", example = "苹果公司")
-    private String company_name;
+    private String companyName;
 }

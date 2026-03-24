@@ -42,9 +42,9 @@ public class Cart implements Serializable {
     @Schema(description = "是否选中: 0-否, 1-是")
     private Integer checked;
 
-    private LocalDateTime createdAt;
+    private LocalDateTime createTime;
 
-    private LocalDateTime updatedAt;
+    private LocalDateTime updateTime;
 
 
 }
