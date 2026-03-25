@@ -1,4 +1,4 @@
-package com.liubingqi.product.domain.vo;
+package com.liubingqi.common.feignClient.product.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

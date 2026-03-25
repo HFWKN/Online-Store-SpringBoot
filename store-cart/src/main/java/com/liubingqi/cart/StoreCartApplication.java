@@ -13,7 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
  */
 @SpringBootApplication
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.liubingqi.common.feignClient")
 @MapperScan("com.liubingqi.cart.mapper")
 @ComponentScan(basePackages = {"com.liubingqi.common", "com.liubingqi.cart"})
 public class StoreCartApplication {

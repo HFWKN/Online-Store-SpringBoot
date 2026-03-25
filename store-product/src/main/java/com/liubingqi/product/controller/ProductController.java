@@ -16,9 +16,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * <p>
@@ -61,4 +65,12 @@ public class ProductController {
         ProductWithCommentVo vo = productService.detailed(productId);
         return Result.success(vo);
     }*/
+    /**
+     *  远程调用 - 根据商品id批量获取商品信息（简略）
+     */
+    @PostMapping("/getByIds")
+    public Result<List<ProductVo>> getByIds(@RequestBody List<Long> productIds){
+        List<ProductVo> volist = productService.getByIds(productIds);
+        return Result.success(volist);
+    }
 }

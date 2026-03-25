@@ -47,6 +47,11 @@ public class UserLike implements Serializable {
     private Long categoryId;
 
     /**
+     *  商品规格id
+     */
+    private Long specId;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

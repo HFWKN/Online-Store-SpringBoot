@@ -2,6 +2,9 @@ package com.liubingqi.auth.service;
 
 import com.liubingqi.auth.domain.po.UserLike;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.liubingqi.auth.domain.vo.UserLikeVo;
+
+import java.util.List;
 
 /**
  * <p>
@@ -12,5 +15,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2026-03-20
  */
 public interface IUserLikeService extends IService<UserLike> {
+
+    // 查询我的收藏
+    List<UserLikeVo> getAll(Long userId);
 
 }

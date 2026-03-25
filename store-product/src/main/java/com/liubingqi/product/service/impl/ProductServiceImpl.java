@@ -1,6 +1,7 @@
 package com.liubingqi.product.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liubingqi.common.constants.ResultCode;
@@ -24,7 +25,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -131,5 +134,46 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
         }
 
         return vo;
+    }
+
+
+    /**
+     *  远程调用 - 根据商品id批量获取商品信息（简略）
+     * @param productIds
+     * @return
+     */
+    @Override
+    public List<ProductVo> getByIds(List<Long> productIds) {
+        // 根据商品id查询商品信息
+        List<Product> list = lambdaQuery()
+                .in(Product::getId, productIds)
+                .list();
+
+        // 没有信息，返回空集合
+        if(CollectionUtil.isEmpty(list)){
+            return new ArrayList<>();
+        }
+        // 获取分类id集合
+        List<Long> categoryIdList = new ArrayList<>(list.size());
+        // 遍历，获取分类id
+        for (Product product : list) {
+            categoryIdList.add(product.getCategoryId());
+        }
+        // 根据分类id查询分类name
+        List<ProductCategory> categoryList = productCategoryService.lambdaQuery()
+                .in(ProductCategory::getId, categoryIdList)
+                .list();
+        // 创建map
+        Map<Long, String> categoryMap = new HashMap<>(categoryList.size());
+        for (ProductCategory category : categoryList) {
+            categoryMap.put(category.getId(), category.getName());
+        }
+        // 有信息，返回信息
+        List<ProductVo> voList = BeanUtil.copyToList(list, ProductVo.class);
+        // 遍历，设置分类name
+        for (ProductVo vo : voList) {
+            vo.setCategoryName(categoryMap.get(vo.getCategoryId()));
+        }
+        return voList;
     }
 }

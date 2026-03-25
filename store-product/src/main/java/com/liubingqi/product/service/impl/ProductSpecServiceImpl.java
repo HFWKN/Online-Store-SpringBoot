@@ -10,9 +10,7 @@ import com.liubingqi.product.service.IProductSpecService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * <p>
@@ -48,5 +46,32 @@ public class ProductSpecServiceImpl extends ServiceImpl<ProductSpecMapper, Produ
             return new ArrayList<>();
         }
         return voList;
+    }
+
+
+    /**
+     *  批量查询商品规格
+     * @param productIds
+     * @return
+     */
+    @Override
+    public List<Map<Long, ProductSpecVo>> selectByIds(List<Long> productIds) {
+        List<ProductSpec> list = lambdaQuery()
+                .in(ProductSpec::getProductId, productIds)
+                .list();
+        if (CollectionUtil.isEmpty(list)){
+            return new ArrayList<>();
+        }
+        // 转VO
+        List<Map<Long, ProductSpecVo>> mapList = new ArrayList<>();
+        // 循环
+        for (ProductSpec productSpec : list) {
+            Map<Long, ProductSpecVo> map = new HashMap<>();
+            ProductSpecVo vo = BeanUtil.copyProperties(productSpec, ProductSpecVo.class);
+            map.put(Long.valueOf(vo.getId()),vo);
+            mapList.add(map);
+        }
+
+        return mapList;
     }
 }

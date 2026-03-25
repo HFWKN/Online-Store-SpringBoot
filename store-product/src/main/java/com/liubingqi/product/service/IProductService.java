@@ -9,6 +9,8 @@ import com.liubingqi.product.domain.vo.ProductSimpleVo;
 import com.liubingqi.product.domain.vo.ProductVo;
 import com.liubingqi.product.domain.vo.ProductWithCommentVo;
 
+import java.util.List;
+
 /**
  * <p>
  * 商品基本信息表 服务类
@@ -25,4 +27,7 @@ public interface IProductService extends IService<Product> {
 
     //查询商品详情页
     ProductWithCommentVo detailed(Integer productId);
+
+    // 远程调用 - 根据商品id批量获取商品信息（简略）
+    List<ProductVo> getByIds(List<Long> productIds);
 }
