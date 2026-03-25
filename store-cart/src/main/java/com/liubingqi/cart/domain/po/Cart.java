@@ -36,8 +36,17 @@ public class Cart implements Serializable {
     @Schema(description = "商品ID")
     private Long productId;
 
+    @Schema(description = "分类ID")
+    private Long categoryId;
+
+    @Schema(description = "规格ID")
+    private String specId;
+
+    @Schema(description = "商品价格")
+    private Double price;
+
     @Schema(description = "数量")
-    private Integer quantity;
+    private Integer num;
 
     @Schema(description = "是否选中: 0-否, 1-是")
     private Integer checked;
