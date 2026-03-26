@@ -2,7 +2,9 @@ package com.liubingqi.product.controller;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.liubingqi.common.domain.Result;
+import com.liubingqi.common.exception.BusinessException;
 import com.liubingqi.product.domain.po.Product;
 import com.liubingqi.product.domain.po.ProductCategory;
 import com.liubingqi.product.domain.vo.ProductCategoryVo;
@@ -11,11 +13,7 @@ import com.liubingqi.product.service.impl.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.Mapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +40,21 @@ public class ProductCategoryController {
     public Result<List<ProductCategoryVo>> list(){
         List<ProductCategory> list = productCategoryService.list();
         List<ProductCategoryVo> voList = BeanUtil.copyToList(list, ProductCategoryVo.class);
+        return Result.success(voList);
+    }
+
+    @PostMapping("/listById")
+    @Operation(summary = "根据id批量查询分类信息")
+    public Result<List<ProductCategoryVo>> listById(List<Long> ids){
+        List<ProductCategory> categoryList = productCategoryService.lambdaQuery()
+                .in(ProductCategory::getId, ids)
+                .list();
+
+        if(CollectionUtil.isEmpty(categoryList)){
+            throw new BusinessException("没有分类信息");
+        }
+
+        List<ProductCategoryVo> voList = BeanUtil.copyToList(categoryList, ProductCategoryVo.class);
         return Result.success(voList);
     }
 

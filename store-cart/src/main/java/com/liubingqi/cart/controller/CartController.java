@@ -2,6 +2,7 @@ package com.liubingqi.cart.controller;
 
 
 import com.liubingqi.cart.domain.dto.CartDto;
+import com.liubingqi.cart.domain.vo.CartVo;
 import com.liubingqi.cart.service.ICartService;
 import com.liubingqi.common.domain.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * <p>
@@ -43,4 +46,16 @@ public class CartController {
         return Result.success();
     }
 
+
+    /**
+     *
+     *  查看我的购物车
+     * @return
+     */
+    @PostMapping("/selectAllByCart")
+    @Operation(summary = "查看我的购物车")
+    public Result<List<CartVo>> selectAllByCart(){
+        List<CartVo> voList = cartService.selectAllByCart();
+        return Result.success(voList);
+    }
 }

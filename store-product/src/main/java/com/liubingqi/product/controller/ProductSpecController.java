@@ -1,7 +1,10 @@
 package com.liubingqi.product.controller;
 
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.liubingqi.common.domain.Result;
+import com.liubingqi.product.domain.po.ProductSpec;
 import com.liubingqi.product.domain.vo.ProductSpecVo;
 import com.liubingqi.product.service.IProductSpecService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -53,5 +57,26 @@ public class ProductSpecController {
     public Result<List<Map<Long,ProductSpecVo>>> selectByIds(@RequestBody List<Long> productIds){
         List<Map<Long,ProductSpecVo>> list = productSpecService.selectByIds(productIds);
         return Result.success(list);
+    }
+
+
+    /**
+     *  根据规格ids查询商品规格
+     * @param specIds
+     * @return
+     */
+    @PostMapping("/getBySpecIds")
+    @Operation(summary = "根据规格ids查询商品规格")
+    public Result<List<ProductSpecVo>> getBySpecIds(@RequestBody List<Long> specIds){
+        List<ProductSpec> list = productSpecService.lambdaQuery()
+                .in(ProductSpec::getId, specIds)
+                .list();
+        if (CollectionUtil.isEmpty(list)){
+            return Result.success(new ArrayList<>());
+        }
+        // 转VO
+        List<ProductSpecVo> voList = BeanUtil.copyToList(list, ProductSpecVo.class);
+
+        return Result.success(voList);
     }
 }

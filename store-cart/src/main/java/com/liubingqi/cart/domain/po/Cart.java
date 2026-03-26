@@ -40,7 +40,7 @@ public class Cart implements Serializable {
     private Long categoryId;
 
     @Schema(description = "规格ID")
-    private String specId;
+    private Long specId;
 
     @Schema(description = "商品价格")
     private Double price;
