@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -75,7 +76,11 @@ public class ProductSpecController {
             return Result.success(new ArrayList<>());
         }
         // 转VO
-        List<ProductSpecVo> voList = BeanUtil.copyToList(list, ProductSpecVo.class);
+        List<ProductSpecVo> voList = list.stream().map(po -> {
+            ProductSpecVo vo = BeanUtil.copyProperties(po, ProductSpecVo.class);
+            vo.setProductSpec(po.getProductSpec());
+            return vo;
+        }).collect(Collectors.toList());
 
         return Result.success(voList);
     }

@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -39,7 +40,11 @@ public class ProductSpecServiceImpl extends ServiceImpl<ProductSpecMapper, Produ
                 .eq(ProductSpec::getProductId, productId)
                 .list();
         // 转VO
-        List<ProductSpecVo> voList = BeanUtil.copyToList(list, ProductSpecVo.class);
+        List<ProductSpecVo> voList = list.stream().map(po -> {
+            ProductSpecVo vo = BeanUtil.copyProperties(po, ProductSpecVo.class);
+            vo.setProductSpec(po.getProductSpec());
+            return vo;
+        }).collect(Collectors.toList());
 
         // 如果没有数据，就返回空集合
         if(CollectionUtil.isEmpty(voList)){
@@ -68,6 +73,7 @@ public class ProductSpecServiceImpl extends ServiceImpl<ProductSpecMapper, Produ
         for (ProductSpec productSpec : list) {
             Map<Long, ProductSpecVo> map = new HashMap<>();
             ProductSpecVo vo = BeanUtil.copyProperties(productSpec, ProductSpecVo.class);
+            vo.setProductSpec(productSpec.getProductSpec());
             map.put(Long.valueOf(vo.getId()),vo);
             mapList.add(map);
         }

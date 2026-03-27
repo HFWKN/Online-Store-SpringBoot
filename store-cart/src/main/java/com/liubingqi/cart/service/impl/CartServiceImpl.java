@@ -167,7 +167,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
             cartVo.setCategoryId(c.getCategoryId());
             cartVo.setCategoryName(categoryMap.get(c.getCategoryId()).getName());
             cartVo.setSpecPrice(specMap.get(c.getSpecId()).getSpecPrice());
-            cartVo.setProductSpec(specMap.get(c.getSpecId()).getSpec());
+            cartVo.setProductSpec(specMap.get(c.getSpecId()).getProductSpec());
             cartList.add(cartVo);
         }
         return cartList;

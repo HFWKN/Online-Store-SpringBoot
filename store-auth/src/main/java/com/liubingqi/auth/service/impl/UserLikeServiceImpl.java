@@ -53,11 +53,6 @@ public class UserLikeServiceImpl extends ServiceImpl<UserLikeMapper, UserLike> i
         if (productIdList.isEmpty()) {
             return new ArrayList<>();
         }
-  /*      //获取分类id
-        List<Long> categoryIdList = new ArrayList<>(list.size());
-        for (UserLike u : list) {
-            categoryIdList.add(u.getCategoryId());
-        }*/
         // 远程调用，根据商品id获取商品信息和分类信息
         Result<List<ProductVo>> productResult = productFeignClient.getByIds(productIdList);
         List<ProductVo> productVoList = productResult.getData();
@@ -103,8 +98,12 @@ public class UserLikeServiceImpl extends ServiceImpl<UserLikeMapper, UserLike> i
             if (u.getSpecId() != null) {
                 ProductSpecVo specVo = specMap.get(u.getSpecId());
                 if (specVo != null) {
-                    // 设置商品规格和颜色
-                    ulv.setProductSpec(specVo.getColor() + " " + specVo.getSpec());
+                    // 设置商品规格id
+                    ulv.setSpecId(Long.valueOf(specVo.getId()));
+                    // 设置商品规格
+                    ulv.setProductSpec(specVo.getProductSpec());
+                    // 设置商品颜色
+                    ulv.setColor(specVo.getColor());
                     // 设置规格价格
                     ulv.setPrice(specVo.getSpecPrice());
                 }

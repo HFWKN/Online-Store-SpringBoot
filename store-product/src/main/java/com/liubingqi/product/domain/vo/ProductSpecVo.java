@@ -32,5 +32,5 @@ public class ProductSpecVo {
     /**
      * 规格
      */
-    private String spec;
+    private String productSpec;
 }

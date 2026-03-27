@@ -3,6 +3,7 @@ package com.liubingqi.product.domain.po;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableField;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -51,7 +52,8 @@ public class ProductSpec implements Serializable {
     /**
      * 规格
      */
-    private String spec;
+    @TableField("product_spec")
+    private String productSpec;
 
     /**
      * 创建时间

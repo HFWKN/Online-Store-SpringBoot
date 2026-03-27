@@ -50,6 +50,16 @@ public class UserLikeVo {
     private BigDecimal price;
 
     /**
+     *  商品规格id
+     */
+    private Long specId;
+
+    /**
+     *  商品颜色
+     */
+    private String color;
+
+    /**
      *  商品规格
      */
     private String productSpec;
