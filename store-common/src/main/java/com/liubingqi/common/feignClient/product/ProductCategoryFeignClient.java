@@ -12,7 +12,7 @@ import java.util.List;
 /**
  *  商品分类服务的远程调用类
  */
-@FeignClient(name = "store-product", path = "/product/category")
+//@FeignClient(name = "store-product", path = "/product/category")
 public interface ProductCategoryFeignClient {
 
 

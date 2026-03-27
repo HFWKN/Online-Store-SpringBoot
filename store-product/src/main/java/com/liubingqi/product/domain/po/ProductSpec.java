@@ -3,6 +3,8 @@ package com.liubingqi.product.domain.po;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import lombok.Data;
@@ -35,6 +37,11 @@ public class ProductSpec implements Serializable {
      * 关联商品ID (store_product.id)
      */
     private Integer productId;
+
+    /**
+     *  规格价格
+     */
+    private BigDecimal specPrice;
 
     /**
      * 颜色

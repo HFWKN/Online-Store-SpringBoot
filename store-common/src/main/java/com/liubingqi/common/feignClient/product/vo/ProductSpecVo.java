@@ -2,6 +2,8 @@ package com.liubingqi.common.feignClient.product.vo;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class ProductSpecVo {
 
@@ -14,6 +16,11 @@ public class ProductSpecVo {
      * 关联商品ID (store_product.id)
      */
     private Integer productId;
+
+    /**
+     *  规格价格
+     */
+    private BigDecimal specPrice;
 
     /**
      * 颜色

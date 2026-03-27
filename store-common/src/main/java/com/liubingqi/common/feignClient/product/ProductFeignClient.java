@@ -2,6 +2,7 @@ package com.liubingqi.common.feignClient.product;
 
 
 import com.liubingqi.common.domain.Result;
+import com.liubingqi.common.feignClient.product.vo.ProductCategoryVo;
 import com.liubingqi.common.feignClient.product.vo.ProductSpecVo;
 import com.liubingqi.common.feignClient.product.vo.ProductVo;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,4 +46,22 @@ public interface ProductFeignClient {
     @PostMapping("/spec/productIds")
     @Operation(summary = "批量查询商品规格")
     Result<List<Map<Long,ProductSpecVo>>> selectByIds(@RequestBody List<Long> productIds);
+
+
+    /**
+     *  根据id批量查询分类信息
+     * @param ids
+     * @return
+     */
+    @PostMapping("/category/listById")
+    Result<List<ProductCategoryVo>> listById(List<Long> ids);
+
+
+    /**
+     *  根据规格ids查询商品规格
+     * @param specIds
+     * @return
+     */
+    @PostMapping("/spec/getBySpecIds")
+    Result<List<ProductSpecVo>> getBySpecIds(@RequestBody List<Long> specIds);
 }

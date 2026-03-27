@@ -13,7 +13,7 @@ import java.util.List;
 /**
  *  商品规格服务的远程调用类
  */
-@FeignClient(name = "store-product", path = "/product/spec")
+//@FeignClient(name = "store-product", path = "/product/spec")
 public interface ProductSpecFeignClient {
 
 

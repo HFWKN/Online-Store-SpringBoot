@@ -97,14 +97,16 @@ public class UserLikeServiceImpl extends ServiceImpl<UserLikeMapper, UserLike> i
                 ulv.setMainImage(pVo.getMainImage());
                 ulv.setCategoryId(pVo.getCategoryId());
                 ulv.setCategoryName(pVo.getCategoryName());
-                ulv.setPrice(pVo.getPrice());
             }
 
             // 设置规格信息
             if (u.getSpecId() != null) {
                 ProductSpecVo specVo = specMap.get(u.getSpecId());
                 if (specVo != null) {
+                    // 设置商品规格和颜色
                     ulv.setProductSpec(specVo.getColor() + " " + specVo.getSpec());
+                    // 设置规格价格
+                    ulv.setPrice(specVo.getSpecPrice());
                 }
             }
 
