@@ -41,8 +41,8 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
 
 
     private final ProductFeignClient productFeignClient;
-    private final ProductCategoryFeignClient CategoryFeignClient;
-    private final ProductSpecFeignClient productSpecFeignClient;
+    //private final ProductCategoryFeignClient CategoryFeignClient;
+    //private final ProductSpecFeignClient productSpecFeignClient;
 
     /**
      *  添加商品到购物车
@@ -134,7 +134,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         }
 
         // 远程调用，获取分类信息，并封装进map
-        Result<List<ProductCategoryVo>> categoryInfo = CategoryFeignClient.listById(categoryIds);
+        Result<List<ProductCategoryVo>> categoryInfo = productFeignClient.listById(categoryIds);
         List<ProductCategoryVo> categoryList = categoryInfo.getData();
         if(CollectionUtil.isEmpty(categoryList)){
             return new ArrayList<>();
@@ -145,7 +145,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         }
 
         // 远程调用，获取规格信息，并封装进map
-        Result<List<ProductSpecVo>> specInfo = productSpecFeignClient.getBySpecIds(specIds);
+        Result<List<ProductSpecVo>> specInfo = productFeignClient.getBySpecIds(specIds);
         List<ProductSpecVo> specList = specInfo.getData();
         if(CollectionUtil.isEmpty(specList)){
             return new ArrayList<>();
@@ -166,7 +166,7 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
             cartVo.setMainImage(productMap.get(c.getProductId()).getMainImage());
             cartVo.setCategoryId(c.getCategoryId());
             cartVo.setCategoryName(categoryMap.get(c.getCategoryId()).getName());
-            cartVo.setPrice(BigDecimal.valueOf(priceMap.get(c.getId())));
+            cartVo.setSpecPrice(specMap.get(c.getSpecId()).getSpecPrice());
             cartVo.setProductSpec(specMap.get(c.getSpecId()).getSpec());
             cartList.add(cartVo);
         }

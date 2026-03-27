@@ -48,7 +48,7 @@ public class CartVo {
         /**
          *  价格
          */
-        private BigDecimal price;
+        private BigDecimal specPrice;
 
         /**
          *  商品规格
