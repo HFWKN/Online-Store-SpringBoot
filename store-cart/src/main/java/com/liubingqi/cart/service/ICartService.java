@@ -22,4 +22,7 @@ public interface ICartService extends IService<Cart> {
 
     // 查看我的购物车
     List<CartVo> selectAllByCart();
+
+    // 根据商品名称查询购物车
+    List<Long> selectByName(String name);
 }

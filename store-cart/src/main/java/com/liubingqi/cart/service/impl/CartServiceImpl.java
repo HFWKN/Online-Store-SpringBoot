@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -102,9 +103,6 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
             // 返回空集合
             return new ArrayList<>();
         }
-        // 创建map，里面存放购物车id 和 叠加的金额
-        Map<Long, Double> priceMap = new HashMap<>();
-
         // 创建商品ids集合
         List<Long> productIds = new ArrayList<>();
         // 创建分类ids集合
@@ -117,7 +115,6 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
             productIds.add(c.getProductId());
             categoryIds.add(c.getCategoryId());
             specIds.add(c.getSpecId());
-            priceMap.put(c.getId(), c.getPrice());
         }
 
 
@@ -158,18 +155,48 @@ public class CartServiceImpl extends ServiceImpl<CartMapper, Cart> implements IC
         // 创建购物车信息集合
         List<CartVo> cartList = new ArrayList<>();
         for (Cart c : list) {
+            ProductVo productVo = productMap.get(c.getProductId());
+            ProductCategoryVo categoryVo = categoryMap.get(c.getCategoryId());
+            ProductSpecVo specVo = specMap.get(c.getSpecId());
             CartVo cartVo = new CartVo();
             cartVo.setId(c.getId());
             cartVo.setUserId(userId);
             cartVo.setProductId(c.getProductId());
-            cartVo.setProductName(productMap.get(c.getProductId()).getName());
-            cartVo.setMainImage(productMap.get(c.getProductId()).getMainImage());
+            cartVo.setProductName(productVo.getName());
+            cartVo.setMainImage(productVo.getMainImage());
             cartVo.setCategoryId(c.getCategoryId());
-            cartVo.setCategoryName(categoryMap.get(c.getCategoryId()).getName());
-            cartVo.setSpecPrice(specMap.get(c.getSpecId()).getSpecPrice());
-            cartVo.setProductSpec(specMap.get(c.getSpecId()).getProductSpec());
+            cartVo.setCategoryName(categoryVo.getName());
+            cartVo.setSpecPrice(specVo.getSpecPrice());
+            cartVo.setNum(c.getNum());
+            cartVo.setColor(specVo.getColor());
+            cartVo.setAllPrice(specVo.getSpecPrice().multiply(BigDecimal.valueOf(c.getNum())));
+            cartVo.setProductSpec(specVo.getProductSpec());
             cartList.add(cartVo);
         }
         return cartList;
+    }
+
+
+    /**
+     *  根据商品名称查询购物车
+     * @param name
+     * @return
+     */
+    @Override
+    public List<Long> selectByName(String name) {
+        // 现根据商品名称查询商品id
+        Result<List<Long>> productIdsInfo = productFeignClient.getByName(name);
+        List<Long> productIds = productIdsInfo.getData();
+        if(CollectionUtil.isEmpty(productIds)){
+            return new ArrayList<>();
+        }
+        // 创建查询条件
+        List<Cart> list = lambdaQuery()
+                .eq(Cart::getUserId, UserContext.getUserId())
+                .in(Cart::getProductId, productIds)
+                .list();
+        // 获取list中的cartId
+        List<Long> cartIds = list.stream().map(Cart::getId).collect(Collectors.toList());
+        return cartIds;
     }
 }

@@ -8,11 +8,7 @@ import com.liubingqi.common.domain.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -57,5 +53,35 @@ public class CartController {
     public Result<List<CartVo>> selectAllByCart(){
         List<CartVo> voList = cartService.selectAllByCart();
         return Result.success(voList);
+    }
+
+
+    /**
+     *  批量删除购物车中的商品
+     * @param ids
+     * @return
+     */
+    @PostMapping("/deleteCart")
+    @Operation(summary = "批量删除购物车中的商品")
+    public Result<Void> deleteCart(@RequestBody List<Long> ids){
+        cartService.removeByIds(ids);
+        return Result.success();
+    }
+
+
+    /**
+     *  根据商品名称查询购物车
+     * @param name
+     * @return
+     */
+    @GetMapping("/selectByName")
+    @Operation(summary = "根据商品名称查询购物车")
+    public Result<List<Long >> selectByName(String name){
+        /**
+         *  1.根据商品名称查询
+         *  2.返回商品id集合
+         */
+        List<Long> cartVos = cartService.selectByName(name);
+        return Result.success(cartVos);
     }
 }

@@ -5,7 +5,7 @@ import lombok.Data;
 
 
 /**
- *  添加购物车dto
+ *  购物车dto
  */
 @Data
 public class CartDto {
@@ -34,5 +34,10 @@ public class CartDto {
      *  商品数量
      */
     private Integer num;
+
+    /**
+     *  商品总价
+     */
+    private Double allPrice;
 
 }

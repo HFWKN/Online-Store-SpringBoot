@@ -45,7 +45,7 @@ public class ProductCategoryController {
 
     @PostMapping("/listById")
     @Operation(summary = "根据id批量查询分类信息")
-    public Result<List<ProductCategoryVo>> listById(List<Long> ids){
+    public Result<List<ProductCategoryVo>> listById(@RequestBody List<Long> ids){
         List<ProductCategory> categoryList = productCategoryService.lambdaQuery()
                 .in(ProductCategory::getId, ids)
                 .list();

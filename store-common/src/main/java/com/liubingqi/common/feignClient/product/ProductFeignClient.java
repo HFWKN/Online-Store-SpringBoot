@@ -54,7 +54,7 @@ public interface ProductFeignClient {
      * @return
      */
     @PostMapping("/category/listById")
-    Result<List<ProductCategoryVo>> listById(List<Long> ids);
+    Result<List<ProductCategoryVo>> listById(@RequestBody List<Long> ids);
 
 
     /**
@@ -64,4 +64,11 @@ public interface ProductFeignClient {
      */
     @PostMapping("/spec/getBySpecIds")
     Result<List<ProductSpecVo>> getBySpecIds(@RequestBody List<Long> specIds);
+
+
+    /**
+     *  远程调用，根据商品name模糊查询商品id
+     */
+    @GetMapping("/getByName/{name}")
+    Result<List<Long>> getByName(@PathVariable String name);
 }

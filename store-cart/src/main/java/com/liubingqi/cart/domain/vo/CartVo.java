@@ -50,6 +50,12 @@ public class CartVo {
          */
         private BigDecimal specPrice;
 
+        private Integer num;
+
+        private String color;
+
+        private BigDecimal allPrice;
+
         /**
          *  商品规格
          */

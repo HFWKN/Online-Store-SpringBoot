@@ -1,6 +1,7 @@
 package com.liubingqi.product.controller;
 
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.liubingqi.common.domain.PageQuery;
 import com.liubingqi.common.domain.PageResult;
 import com.liubingqi.common.domain.Result;
@@ -72,5 +73,25 @@ public class ProductController {
     public Result<List<ProductVo>> getByIds(@RequestBody List<Long> productIds){
         List<ProductVo> volist = productService.getByIds(productIds);
         return Result.success(volist);
+    }
+
+    /**
+     *  远程调用，根据商品name模糊查询商品id
+     */
+    @GetMapping("/getByName/{name}")
+    public Result<List<Long>> getByName(@PathVariable String name){
+        List<Product> list = productService.lambdaQuery()
+                .like(Product::getName, name)
+                .list();
+
+        // 获取商品id
+        List<Long> productIds = list.stream()
+                .map(Product::getId)
+                .toList();
+
+        if(CollectionUtil.isEmpty(productIds)){
+            return Result.success();
+        }
+        return Result.success(productIds);
     }
 }
