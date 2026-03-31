@@ -1,5 +1,6 @@
 package com.liubingqi.order.service;
 
+import com.liubingqi.order.domain.dto.CreateOrderDto;
 import com.liubingqi.order.domain.po.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -13,4 +14,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IOrderService extends IService<Order> {
 
+
+    // 用户下单
+    String pay(CreateOrderDto dto);
 }

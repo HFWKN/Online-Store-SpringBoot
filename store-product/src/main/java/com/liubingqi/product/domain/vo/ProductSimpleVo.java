@@ -36,6 +36,13 @@ public class ProductSimpleVo {
 /*    @Schema(description = "状态描述")
     private String statusDesc;*/
 
+/*    @Schema(description = "库存")
+    private Integer stock;*/
+
+    @Schema(description = "总售卖数量",defaultValue = "0")
+    private Integer saleNum;
+
+
     @Schema(description = "所属公司id")
     private String companyId;
 

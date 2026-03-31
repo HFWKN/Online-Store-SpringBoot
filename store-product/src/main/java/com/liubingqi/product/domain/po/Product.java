@@ -51,8 +51,14 @@ public class Product implements Serializable {
     @Schema(description = "分类ID")
     private Long categoryId;
 
+/*    @Schema(description = "库存")
+    private Integer stock;*/
+
     @Schema(description = "上架状态: 0-下架, 1-上架")
     private Integer status;
+
+    @Schema(description = "总售卖数量",defaultValue = "0")
+    private Integer saleNum;
 
     @Schema(description = "所属公司id")
     private String companyId;

@@ -53,6 +53,13 @@ public class ProductWithCommentVo {
     @Schema(description = "所属公司name")
     private String companyName;
 
+    //@Schema(description = "库存")
+    //private Integer stock;
+
+    @Schema(description = "总售卖数量",defaultValue = "0")
+    private Integer saleNum;
+
+
     @Schema(description = "创建时间")
     private LocalDateTime createTime;
 

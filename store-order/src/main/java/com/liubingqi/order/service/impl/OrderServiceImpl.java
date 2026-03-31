@@ -1,5 +1,6 @@
 package com.liubingqi.order.service.impl;
 
+import com.liubingqi.order.domain.dto.CreateOrderDto;
 import com.liubingqi.order.domain.po.Order;
 import com.liubingqi.order.mapper.OrderMapper;
 import com.liubingqi.order.service.IOrderService;
@@ -17,4 +18,15 @@ import org.springframework.stereotype.Service;
 @Service
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements IOrderService {
 
+
+    /**
+     *  用户下单
+     * @param dto
+     * @return
+     */
+    @Override
+    public String pay(CreateOrderDto dto) {
+
+        return null;
+    }
 }

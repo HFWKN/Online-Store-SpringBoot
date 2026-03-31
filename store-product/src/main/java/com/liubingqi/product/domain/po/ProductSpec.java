@@ -45,6 +45,15 @@ public class ProductSpec implements Serializable {
     private BigDecimal specPrice;
 
     /**
+     *  规格库存
+     */
+    private Integer stock;
+
+    /**
+     *  售出数量
+     */
+    private Integer saleNum;
+    /**
      * 颜色
      */
     private String color;
