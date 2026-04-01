@@ -2,6 +2,7 @@ package com.liubingqi.order.mapper;
 
 import com.liubingqi.order.domain.po.Order;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -12,5 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2026-03-17
  */
 public interface OrderMapper extends BaseMapper<Order> {
+
+
 
 }

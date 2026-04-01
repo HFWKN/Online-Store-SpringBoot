@@ -20,6 +20,16 @@ public class UserAddressDto {
     private Long userid;
 
     /**
+     *  收货人姓名
+     */
+    private String receiverName;
+
+    /**
+     * 收货人电话
+     */
+    private String receiverPhone;
+
+    /**
      * 详细地址
      */
     private String address;

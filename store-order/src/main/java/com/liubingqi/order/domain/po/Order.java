@@ -44,6 +44,9 @@ public class Order implements Serializable {
     @Schema(description = "实付金额")
     private BigDecimal payAmount;
 
+    @Schema(description = "备注")
+    private String remark;
+
     @Schema(description = "状态: 0-待支付, 1-已支付, 2-已发货, 3-已完成, 4-已取消")
     private Integer status;
 

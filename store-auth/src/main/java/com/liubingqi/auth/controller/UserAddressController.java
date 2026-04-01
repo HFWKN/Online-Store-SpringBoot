@@ -35,7 +35,7 @@ public class UserAddressController {
 
 
     /**
-     *  查询该用户的收货地址
+     *  查询该用户的收货地址信息
      * @return
      */
     @GetMapping("/select")
@@ -46,7 +46,7 @@ public class UserAddressController {
     }
 
     /**
-     *  新增收货地址
+     *  新增收货地址信息
      * @param dto
      * dto里面只需要地址
      */
@@ -63,7 +63,7 @@ public class UserAddressController {
 
 
     /**
-     *  修改默认收货地址
+     *  修改默认收货地址信息
      * @param addressId
      * 前端传“要修改为默认地址的地址id”
      */
@@ -75,7 +75,7 @@ public class UserAddressController {
     }
 
     /**
-     *  删除收货地址(逻辑删除)
+     *  删除收货地址信息(逻辑删除)
      * @param id
      * 后端需要地址id
      */
@@ -91,7 +91,7 @@ public class UserAddressController {
 
 
     /**
-     *  修改收货地址
+     *  修改收货地址信息
      * @param dto
      * @return
      * 前端需要传dto为{地址id，地址}
@@ -115,5 +115,24 @@ public class UserAddressController {
             throw new BusinessException("修改收货地址出错");
         }
         return Result.success();
+    }
+
+
+    /**
+     *  根据地址id查询地址信息
+     * @param addressId
+     * @return
+     */
+    @GetMapping("/selectByAddressId/{addressId}")
+    @Operation(summary = "根据地址id查询地址")
+    public Result<UserAddressVo> selectByAddressId(@PathVariable Long addressId){
+        UserAddress address = userAddressService.lambdaQuery()
+                .eq(UserAddress::getId, addressId)
+                .eq(UserAddress::getUserid, UserContext.getUserId())
+                .eq(UserAddress::getIsDelete, 0)
+                .one();
+        UserAddressVo vo = new UserAddressVo();
+        BeanUtil.copyProperties(address,vo);
+        return Result.success(vo);
     }
 }

@@ -50,11 +50,25 @@ public class CartVo {
          */
         private BigDecimal specPrice;
 
+        /**
+         *  数量
+         */
         private Integer num;
 
+        /**
+         *  颜色
+         */
         private String color;
 
+        /**
+         *  总价
+         */
         private BigDecimal allPrice;
+
+        /**
+         *  规格id
+         */
+        private Long specId;
 
         /**
          *  商品规格

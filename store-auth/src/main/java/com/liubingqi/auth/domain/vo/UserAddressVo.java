@@ -27,6 +27,17 @@ public class UserAddressVo {
     private String address;
 
     /**
+     *  收货人姓名
+     */
+    private String receiverName;
+
+    /**
+     * 收货人电话
+     */
+    private String receiverPhone;
+
+
+    /**
      * 逻辑删除: 0-未删除, 1-已删除
      */
     private Integer isDelete;

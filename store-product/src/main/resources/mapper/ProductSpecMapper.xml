@@ -2,4 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.liubingqi.product.mapper.ProductSpecMapper">
 
+
+
+    <update id="userPlaceAnOrder">
+        UPDATE store_product_spec
+        SET stock = stock - #{num},
+            sale_num = sale_num + #{num},
+            update_time = NOW()
+        WHERE id = #{specId}
+          AND product_id = #{productId}
+          AND stock >= #{num}
+    </update>
+
 </mapper>

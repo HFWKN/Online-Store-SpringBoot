@@ -1,29 +1,14 @@
-package com.liubingqi.auth.domain.po;
+package com.liubingqi.common.feignClient.user.vo;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
-import java.time.LocalDateTime;
-import java.io.Serializable;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.experimental.Accessors;
 
 /**
- * <p>
- * 用户地址表
- * </p>
- *
- * @author lbq
- * @since 2026-03-22
+ *  收获地址VO
  */
 @Data
-@EqualsAndHashCode(callSuper = false)
-@Accessors(chain = true)
-@TableName("store_user_address")
-public class UserAddress implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class UserAddressVo {
 
     /**
      * 主键ID
@@ -51,6 +36,7 @@ public class UserAddress implements Serializable {
      */
     private String receiverPhone;
 
+
     /**
      * 逻辑删除: 0-未删除, 1-已删除
      */
@@ -60,16 +46,4 @@ public class UserAddress implements Serializable {
      * 是否默认地址: 0-否, 1-是
      */
     private Integer isDefault;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateTime;
-
-
 }

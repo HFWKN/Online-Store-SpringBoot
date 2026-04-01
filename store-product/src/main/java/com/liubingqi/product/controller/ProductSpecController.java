@@ -6,6 +6,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.liubingqi.common.domain.Result;
 import com.liubingqi.product.domain.po.ProductSpec;
 import com.liubingqi.product.domain.vo.ProductSpecVo;
+import com.liubingqi.product.mapper.ProductSpecMapper;
 import com.liubingqi.product.service.IProductSpecService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,6 +34,7 @@ public class ProductSpecController {
 
 
     private final IProductSpecService productSpecService;
+    private final ProductSpecMapper productSpecMapper;
 
 
     /**
@@ -83,5 +85,11 @@ public class ProductSpecController {
         }).collect(Collectors.toList());
 
         return Result.success(voList);
+    }
+
+    @PostMapping("/updateSku/{num}/{productId}/{specId}")
+    public Result<Integer> userPlaceAnOrder(@PathVariable Integer num,@PathVariable Long productId,@PathVariable Long specId){
+        Integer count = productSpecMapper.userPlaceAnOrder(num, productId, specId);
+        return Result.success(count);
     }
 }

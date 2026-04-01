@@ -23,7 +23,7 @@ public interface ProductFeignClient {
 
 
     /**
-     *  根据商品id查询商品信息
+     *  根据商品ids查询商品信息
      * @param productIds
      * @return
      */
@@ -65,10 +65,13 @@ public interface ProductFeignClient {
     @PostMapping("/spec/getBySpecIds")
     Result<List<ProductSpecVo>> getBySpecIds(@RequestBody List<Long> specIds);
 
-
     /**
      *  远程调用，根据商品name模糊查询商品id
      */
     @GetMapping("/getByName/{name}")
     Result<List<Long>> getByName(@PathVariable String name);
+
+
+    @PostMapping("/spec/updateSku/{num}/{productId}/{specId}")
+    Result<Integer> userPlaceAnOrder(@PathVariable Integer num,@PathVariable Long productId,@PathVariable Long specId);
 }

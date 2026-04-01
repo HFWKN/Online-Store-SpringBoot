@@ -42,8 +42,14 @@ public class OrderItem implements Serializable {
     @Schema(description = "商品名称快照")
     private String productName;
 
+    @Schema(description = "商品规格id")
+    private Long specId;
+
     @Schema(description = "商品规格")
     private String productSpec;
+
+    @Schema(description = "颜色")
+    private String color;
 
     @Schema(description = "购买单价快照")
     private BigDecimal productPrice;

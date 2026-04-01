@@ -15,6 +15,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface IOrderService extends IService<Order> {
 
 
+    String getToken();
+
     // 用户下单
-    String pay(CreateOrderDto dto);
+    String userPlaceAnOrder(CreateOrderDto dto, String orderToken);
 }
