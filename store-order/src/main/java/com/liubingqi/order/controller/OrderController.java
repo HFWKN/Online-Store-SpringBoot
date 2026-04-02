@@ -4,6 +4,7 @@ package com.liubingqi.order.controller;
 import com.liubingqi.common.domain.Result;
 import com.liubingqi.common.exception.BusinessException;
 import com.liubingqi.order.domain.dto.CreateOrderDto;
+import com.liubingqi.order.domain.vo.OrderVo;
 import com.liubingqi.order.service.IOrderItemService;
 import com.liubingqi.order.service.IOrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,12 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -66,4 +62,16 @@ public class OrderController {
         String msg = orderService.userPlaceAnOrder(dto, orderToken);
         return Result.success(msg);
     }
+
+
+/*    *//**
+     *  查询当前用户的所有订单
+     * @return
+     *//*
+    @GetMapping("/selectAll/{status}")
+    @Operation(summary = "查询当前用户的所有订单")
+    public Result<List<OrderVo>> selectAll(@PathVariable Integer status){
+        List<OrderVo> voList = orderService.selectAll(status);
+        return Result.success(voList);
+    }*/
 }

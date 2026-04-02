@@ -30,11 +30,20 @@ public class OrderItem implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+    @Schema(description = "用户ID")
+    private Long userId;
+
+    @Schema(description = "状态")
+    private Integer status;
+
     @Schema(description = "关联订单ID")
     private Long orderId;
 
     @Schema(description = "订单编号")
     private String orderNo;
+
+    @Schema(description = "订单明细编号")
+    private String orderItemNo;
 
     @Schema(description = "商品ID")
     private Long productId;

@@ -15,6 +15,7 @@ import com.liubingqi.order.constants.OrderRedisKeyConstants;
 import com.liubingqi.order.domain.dto.CreateOrderDto;
 import com.liubingqi.order.domain.po.Order;
 import com.liubingqi.order.domain.po.OrderItem;
+import com.liubingqi.order.domain.vo.OrderVo;
 import com.liubingqi.order.mapper.OrderItemMapper;
 import com.liubingqi.order.mapper.OrderMapper;
 import com.liubingqi.order.service.IOrderItemService;
@@ -49,6 +50,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final UserFeignClient userFeignClient;
     private final OrderItemMapper orderItemMapper;
 
+
+    /**
+     *  获取下单token
+     * @return
+     */
     @Override
     public String getToken() {
         Long userId = UserContext.getUserId();
@@ -64,7 +70,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     /**
      *  用户下单
      * @param dto
-     * @param orderToken  redis中，key为order_Token
+     * @param orderToken
      * @return
      */
     @Override
@@ -78,7 +84,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             throw new BusinessException("请勿重复提交或下单已失效");
         }
         // 创建订单
-        List<Order> orderList = new ArrayList<>();
+        //List<Order> orderList = new ArrayList<>();
         // 订单编号
         String orderNo = "order_" + System.currentTimeMillis() + "_" + new Random().nextInt(10000);
         // 获取dto中的订单商品信息list(只存商品信息，无地址等)
@@ -168,12 +174,17 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
             }
             // 更改0条，表示无库存或更新失败
             if (update != 1) {
-                throw new BusinessException(productId + specId + "无库存或更新失败");
+                throw new BusinessException("商品ID"+productId + "/ 规格ID" +specId + " 无库存或更新失败");
             }
+            // 生成订单明细编号
+            String orderItemNo = "order_item_" + System.currentTimeMillis() + "_" + new Random().nextInt(10000);
             // 创建订单明细对象
             OrderItem orderItem = new OrderItem();
             orderItem.setOrderId(order.getId()); // 订单id
+            orderItem.setUserId(userId);// 用户id
+            orderItem.setStatus(1);// 订单状态: 已支付
             orderItem.setOrderNo(orderNo); // 订单编号
+            orderItem.setOrderItemNo(orderItemNo);
             orderItem.setProductId(productId); // 商品id
             orderItem.setProductName(productMap.get(productId).getName()); // 商品名称快照
             orderItem.setSpecId(p.getSpecId()); // 商品规格id
@@ -191,8 +202,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         return "下单成功";
     }
-
-
     // 查询商品总价
     private BigDecimal getTotalAmount(List<CreateOrderDto.OrderItemDto> productInfos) {
         if (CollectionUtil.isEmpty(productInfos)) {
@@ -230,4 +239,21 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         return totalAmount;
     }
+
+
+/*    *//**
+     *  查询当前用户的所有订单
+     * @return
+     *//*
+    @Override
+    public List<OrderVo> selectAll(Integer status) {
+        // 获取当前用户id
+        Long userId = UserContext.getUserId();
+        // 根据用户id查询订单主表信息
+        lambdaQuery()
+                .eq(Order::getUserId, userId)
+                .eq(status != null, Order::getStatus, status)
+
+        return null;
+    }*/
 }
