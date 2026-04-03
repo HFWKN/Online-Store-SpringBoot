@@ -87,9 +87,27 @@ public class ProductSpecController {
         return Result.success(voList);
     }
 
+
+    /**
+     *  用户下单，判断库存并减库存
+     * @param num
+     * @param productId
+     * @param specId
+     * @return
+     */
     @PostMapping("/updateSku/{num}/{productId}/{specId}")
     public Result<Integer> userPlaceAnOrder(@PathVariable Integer num,@PathVariable Long productId,@PathVariable Long specId){
-        Integer count = productSpecMapper.userPlaceAnOrder(num, productId, specId);
+        Integer count = productSpecService.userPlaceAnOrder(num, productId, specId);
         return Result.success(count);
     }
+
+
+/*    *//**
+     *  远程调用，回滚库存
+     *//*
+    @GetMapping("/rollbackStock/{num}/{productId}/{specId}")
+    public Result<Integer> rollbackStock(@PathVariable Integer num, @PathVariable Long productId, @PathVariable Long specId){
+        Integer result = productSpecService.rollbackStock(num, productId, specId);
+        return Result.success(result);
+    }*/
 }

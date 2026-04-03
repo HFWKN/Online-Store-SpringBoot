@@ -3,12 +3,14 @@ package com.liubingqi.product.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.liubingqi.common.exception.BusinessException;
+import com.liubingqi.product.domain.po.Product;
 import com.liubingqi.product.domain.po.ProductSpec;
 import com.liubingqi.product.domain.vo.ProductSpecVo;
 import com.liubingqi.product.mapper.ProductSpecMapper;
 import com.liubingqi.product.service.IProductSpecService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -79,5 +81,43 @@ public class ProductSpecServiceImpl extends ServiceImpl<ProductSpecMapper, Produ
         }
 
         return mapList;
+    }
+
+
+   /* *//**
+     *  远程调用，回滚库存
+     * @param num
+     * @param productId
+     * @param specId
+     * @return
+     *//*
+    @Override
+    @Transactional
+    public Integer rollbackStock(Integer num, Long productId, Long specId) {
+        // 根据商品id和规格id去恢复库存
+        ProductSpec productSpec = lambdaQuery()
+                .eq(ProductSpec::getProductId, productId)
+                .eq(ProductSpec::getId, specId)
+                .one();
+        if(productSpec == null){
+            throw new BusinessException("商品信息为空");
+        }
+        // 恢复库存
+        productSpec.setStock(productSpec.getStock() + num);
+        // 售卖数量=售卖数量-num
+        productSpec.setSaleNum(productSpec.getSaleNum() - num);
+        if (!updateById(productSpec)){
+            throw new BusinessException("回滚库存失败");
+        }
+        return 1;
+    }*/
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Integer userPlaceAnOrder(Integer num, Long productId, Long specId) {
+        if (num == null || num <= 0 || productId == null || specId == null) {
+            throw new BusinessException("扣库存参数不合法");
+        }
+        return baseMapper.userPlaceAnOrder(num, productId, specId);
     }
 }

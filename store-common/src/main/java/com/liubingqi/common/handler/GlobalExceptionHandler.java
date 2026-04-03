@@ -75,7 +75,22 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(Exception.class)
     public Result<?> handleException(Exception e) {
+        BusinessException businessException = findBusinessException(e);
+        if (businessException != null) {
+            log.warn("业务异常(包装后): {}", businessException.getMessage());
+            return Result.error(businessException.getCode(), businessException.getMessage());
+        }
         log.error("系统异常", e);
         return Result.error(ResultCode.INTERNAL_SERVER_ERROR, "系统繁忙，请稍后再试");
+    }
+
+    private BusinessException findBusinessException(Throwable throwable) {
+        while (throwable != null) {
+            if (throwable instanceof BusinessException businessException) {
+                return businessException;
+            }
+            throwable = throwable.getCause();
+        }
+        return null;
     }
 }

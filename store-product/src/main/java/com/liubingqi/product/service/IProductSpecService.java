@@ -22,4 +22,9 @@ public interface IProductSpecService extends IService<ProductSpec> {
 
     // 批量查询商品规格
     List<Map<Long, ProductSpecVo>> selectByIds(List<Long> productIds);
+
+    // 远程调用，回滚库存
+    //Integer rollbackStock(Integer num, Long productId, Long specId);
+    // 校验库存，扣减库存
+    Integer userPlaceAnOrder(Integer num, Long productId, Long specId);
 }

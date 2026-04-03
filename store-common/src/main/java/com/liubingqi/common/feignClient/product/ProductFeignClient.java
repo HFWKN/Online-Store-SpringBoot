@@ -74,4 +74,10 @@ public interface ProductFeignClient {
 
     @PostMapping("/spec/updateSku/{num}/{productId}/{specId}")
     Result<Integer> userPlaceAnOrder(@PathVariable Integer num,@PathVariable Long productId,@PathVariable Long specId);
+
+    /**
+     *  远程调用，回滚库存
+     */
+    @GetMapping("/spec/rollbackStock/{num}/{productId}/{specId}")
+    Result<Integer> rollbackStock(@PathVariable Integer num, @PathVariable Long productId, @PathVariable Long specId);
 }

@@ -30,4 +30,5 @@ public interface IProductService extends IService<Product> {
 
     // 远程调用 - 根据商品id批量获取商品信息（简略）
     List<ProductVo> getByIds(List<Long> productIds);
+
 }

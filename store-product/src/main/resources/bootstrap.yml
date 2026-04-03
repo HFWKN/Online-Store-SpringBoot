@@ -19,6 +19,8 @@ spring:
         shared-configs:
           - data-id: shared-mysql.yaml
             refresh: false
+          - data-id: shared-seata.yaml
+            refresh: false
           - data-id: shared-redis.yaml
             refresh: true
           - data-id: shared-mybatis.yaml

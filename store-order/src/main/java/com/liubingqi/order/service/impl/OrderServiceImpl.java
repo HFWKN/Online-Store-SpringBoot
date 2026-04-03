@@ -21,6 +21,7 @@ import com.liubingqi.order.mapper.OrderMapper;
 import com.liubingqi.order.service.IOrderItemService;
 import com.liubingqi.order.service.IOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
      * @return
      */
     @Override
-    @Transactional
+    @GlobalTransactional
     public String userPlaceAnOrder(CreateOrderDto dto, String orderToken) {
         Long userId = UserContext.getUserId();
         String key = OrderRedisKeyConstants.ORDER_TOKEN_KEY_PREFIX + userId;
