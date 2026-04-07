@@ -3,6 +3,8 @@ package com.liubingqi.seckill.domain.po;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,8 +33,23 @@ public class Stock implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
+    @Schema(description = "秒杀活动名称ID")
+    private Long activityId;
+
+    @Schema(description = "秒杀活动名称（场次）")
+    private String activityName;
+
     @Schema(description = "关联商品ID")
     private Long productId;
+
+    @Schema(description = "关联商品规格ID")
+    private Long productSpecId;
+
+    @Schema(description = "下单价格快照")
+    private BigDecimal orderPrice;
+
+    @Schema(description = "优惠幅度（几折：8.00 = 8折）")
+    private BigDecimal discountRange;
 
     @Schema(description = "总库存")
     private Integer totalStock;

@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2026-03-17
  */
 @RestController
-@RequestMapping("/stock")
+@RequestMapping("/seckill")
 public class StockController {
 
 }
