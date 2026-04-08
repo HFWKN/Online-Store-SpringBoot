@@ -60,7 +60,7 @@ public class ProductServiceImpl extends ServiceImpl<ProductMapper, Product> impl
                       Product::getName, pageQuery.getProductName()) // 商品名称（模糊，有值才查）
                 .orderByAsc(pageQuery.getSort() != null && pageQuery.getSort() == 1, Product::getPrice) // 价格升序
                 .orderByDesc(pageQuery.getSort() != null && pageQuery.getSort() == 2, Product::getPrice) // 价格降序
-                .page(pageQuery.toMpPageDefaultSortByCreateTimeDesc());
+                .page(pageQuery.toMpPageDefaultSortByIdAsc());
 
         // 2.获取本页信息
         List<Product> records = pageList.getRecords();

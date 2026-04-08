@@ -85,4 +85,11 @@ public class PageQuery {
     public <T> Page<T> toMpPageDefaultSortByCreateTimeDesc() {
         return toMpPage("create_time", false);
     }
+    /**
+     *  按id升序
+     *
+     */
+    public <T> Page<T> toMpPageDefaultSortByIdAsc() {
+        return toMpPage("id", true);
+    }
 }
