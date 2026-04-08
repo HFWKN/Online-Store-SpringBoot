@@ -1,7 +1,10 @@
 package com.liubingqi.seckill.service;
 
+import com.liubingqi.common.domain.Result;
 import com.liubingqi.seckill.domain.po.Stock;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.liubingqi.seckill.domain.vo.StockVo;
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface IStockService extends IService<Stock> {
 
+    // 查询活动商品的规格信息
+    Result<List<StockVo>> list(Long productId);
 }
