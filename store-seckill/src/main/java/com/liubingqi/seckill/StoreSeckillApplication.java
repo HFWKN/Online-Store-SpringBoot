@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 秒杀服务启动类
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.ComponentScan;
 @EnableFeignClients(basePackages = "com.liubingqi.common.feignClient")
 @MapperScan("com.liubingqi.seckill.mapper")
 @ComponentScan(basePackages = {"com.liubingqi.common", "com.liubingqi.seckill"})
+@EnableScheduling
 public class StoreSeckillApplication {
 
     public static void main(String[] args) {

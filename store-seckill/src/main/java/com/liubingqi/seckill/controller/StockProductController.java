@@ -39,7 +39,7 @@ public class StockProductController {
      */
     @GetMapping("/list/{activityId}")
     @Operation(summary = "查询参与改成活动的商品")
-    public Result<List<StockProductVo>> list(@PathVariable Long activityId){
-        return stockProductService.list(activityId);
+    public Result<List<StockProductVo>> listByAcId(@PathVariable Long activityId){
+        return stockProductService.listByAcId(activityId);
     }
 }

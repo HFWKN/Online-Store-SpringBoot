@@ -45,7 +45,7 @@ public class StockProductServiceImpl extends ServiceImpl<StockProductMapper, Sto
      * @return
      */
     @Override
-    public Result<List<StockProductVo>> list(Long activityId) {
+    public Result<List<StockProductVo>> listByAcId(Long activityId) {
         if(activityId == null){
             throw new BusinessException("无该活动信息");
         }
@@ -53,6 +53,7 @@ public class StockProductServiceImpl extends ServiceImpl<StockProductMapper, Sto
         String cacheKey = SeckillRedisKeyConstants.SECKILL_LIST_KEY_PREFIX + activityId;
         String cacheValue = redisUtils.get(cacheKey);
         if (StrUtil.isNotBlank(cacheValue)) {
+            // 解析缓存数据，转换成 StockProductVo 对象
             List<StockProductVo> cachedList = JSON.parseArray(cacheValue, StockProductVo.class);
             return Result.success(cachedList);
         }

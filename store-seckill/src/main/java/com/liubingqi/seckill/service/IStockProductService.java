@@ -19,5 +19,5 @@ public interface IStockProductService extends IService<StockProduct> {
 
 
     // 获取当前活动秒杀商品列表
-    Result<List<StockProductVo>> list(Long activityId);
+    Result<List<StockProductVo>> listByAcId(Long activityId);
 }

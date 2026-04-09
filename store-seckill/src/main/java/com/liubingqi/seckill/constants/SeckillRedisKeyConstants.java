@@ -13,15 +13,15 @@ public class SeckillRedisKeyConstants {
 
     /**
      * 秒杀商品详情缓存 Key 前缀
-     * 实际使用: SECKILL_DETAIL_KEY_PREFIX + activityId + ":" + productId
+     * 实际使用: SECKILL_SPEC_KEY_PREFIX + activityId + ":" + productId
      */
-    public static final String SECKILL_DETAIL_KEY_PREFIX = "online:store:seckill:detail:";
+    public static final String SECKILL_SPEC_KEY_PREFIX = "online:store:seckill:spec:";
 
     /**
      * 秒杀库存缓存 Key 前缀
-     * 实际使用: SECKILL_STOCK_KEY_PREFIX + stockId
+     * 实际使用: SECKILL_NUM_KEY_PREFIX + activityId:productId:specId
      */
-    public static final String SECKILL_STOCK_KEY_PREFIX = "online:store:seckill:stock:";
+    public static final String SECKILL_NUM_KEY_PREFIX = "online:store:seckill:num:";
 
     /**
      * 秒杀令牌缓存 Key 前缀（防刷）
@@ -40,6 +40,12 @@ public class SeckillRedisKeyConstants {
      * 实际使用: SECKILL_BUY_COUNT_KEY_PREFIX + userId + ":" + activityId
      */
     public static final String SECKILL_BUY_COUNT_KEY_PREFIX = "online:store:seckill:buy_count:";
+
+    public static final String SECKILL_WARMUP_TASK_LOCK_KEY = "online:store:seckill:lock:warmup:task";
+
+    public static final String SECKILL_WARMUP_STOCK_LOCK_KEY_PREFIX = "online:store:seckill:lock:warmup:stock:";
+
+    public static final String SECKILL_SPEC_LOCK_KEY_PREFIX = "online:store:seckill:lock:spec:";
 
     private SeckillRedisKeyConstants() {
     }
