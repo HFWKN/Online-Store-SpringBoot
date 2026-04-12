@@ -4,6 +4,7 @@ package com.liubingqi.seckill.controller;
 import com.liubingqi.common.domain.Result;
 import com.liubingqi.seckill.domain.vo.ActivityVo;
 import com.liubingqi.seckill.service.IActivityService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,7 @@ public class ActivityController {
      * @return
      */
     @GetMapping("/list")
+    @Operation(summary = "获取秒杀活动列表")
     public Result<ActivityVo> selectActivity(){
         return activityService.selectActivity();
     }

@@ -9,4 +9,6 @@ public class StockDto {
     private String productName;
     private Long activityId;
     private String imageUrl ;
+    private Long stockId;
+    private Long specId;
 }

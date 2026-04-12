@@ -56,9 +56,6 @@ public class OrderController {
             log.error("无下单token标识");
             throw new BusinessException("此次为非法下单");
         }
-      /*  // 判断dto非空
-        List<CreateOrderDto.OrderItemDto> items = dto.getItems();
-        if(items.)*/
         String msg = orderService.userPlaceAnOrder(dto, orderToken);
         return Result.success(msg);
     }

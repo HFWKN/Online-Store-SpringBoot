@@ -31,6 +31,7 @@ public class StockController {
      *  查询活动商品的规格信息
      * @param stockDto
      * @return
+     * dto 只需要activityId 和 productId
      */
     @PostMapping("/getStockSpecList")
     @Operation(summary = "查询活动商品的规格信息")
@@ -43,6 +44,7 @@ public class StockController {
      *  预热活动商品的规格库存
      * @param stockDto
      * @return
+     * dto 只需要activityId 和 productId
      */
     @PostMapping("/getStockNum")
     @Operation(summary = "预热活动商品的规格库存")

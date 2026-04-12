@@ -22,6 +22,7 @@ import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -46,6 +47,7 @@ public class StockServiceImpl extends ServiceImpl<StockMapper, Stock> implements
     // 强类型注入
     @Qualifier("redisTemplate")
     private final RedisTemplate<String, Object> redisTemplate;
+    private final StringRedisTemplate stringRedisTemplate;
     private final IActivityService activityService;
     private final RedissonClient redissonClient;
 
@@ -165,13 +167,14 @@ public class StockServiceImpl extends ServiceImpl<StockMapper, Stock> implements
             }
             long ttlSeconds = resolveCacheTtlSeconds(activityId);
             for (Stock s : stockNumList) {
-                SpecNum specNum = new SpecNum();
+                /*SpecNum specNum = new SpecNum();
                 specNum.setStockId(s.getId());
                 specNum.setSpecId(s.getProductSpecId());
                 specNum.setProductId(s.getProductId());
-                specNum.setNum(s.getAvailableStock());
+                specNum.setNum(s.getAvailableStock());*/
+                Integer specNum = s.getAvailableStock();
                 String specNumKey = SeckillRedisKeyConstants.SECKILL_NUM_KEY_PREFIX + activityId + ":"+ productId + ":"+ s.getProductSpecId();
-                redisTemplate.opsForValue().set(specNumKey, specNum, ttlSeconds, TimeUnit.SECONDS);
+                stringRedisTemplate.opsForValue().set(specNumKey, String.valueOf(specNum), ttlSeconds, TimeUnit.SECONDS);
             }
             return Result.success();
         } catch (InterruptedException e) {
