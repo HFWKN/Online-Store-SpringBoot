@@ -5,6 +5,7 @@ import com.liubingqi.common.domain.Result;
 import com.liubingqi.common.exception.BusinessException;
 import com.liubingqi.seckill.domain.dto.SeckillCreateOrderDto;
 import com.liubingqi.seckill.domain.dto.StockDto;
+import com.liubingqi.seckill.domain.vo.CodeInfoVo;
 import com.liubingqi.seckill.service.IStockOrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +29,7 @@ public class StockOrderController {
      */
     @PostMapping()
     @Operation(summary = "扣减库存-redis-mq通知订单服务生成订单")
-    public Result<String> stockOrder(
+    public Result<CodeInfoVo> stockOrder(
             @RequestHeader("X-SeckillOrder-Token") String orderToken,
             @RequestBody SeckillCreateOrderDto dto){
        if (orderToken == null || orderToken.isBlank()) {
@@ -37,8 +38,8 @@ public class StockOrderController {
        if (dto.getNum() != 1){
            throw new BusinessException("非法下单,数量大于1");
        }
-        String message = stockOrderService.stockOrder(dto, orderToken);
-        return Result.success(message);
+        CodeInfoVo vo = stockOrderService.stockOrder(dto, orderToken);
+        return Result.success(vo);
     }
 
 

@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -185,6 +186,41 @@ public class StockServiceImpl extends ServiceImpl<StockMapper, Stock> implements
                 lock.unlock();
             }
         }
+    }
+
+
+    /**
+     *  扣减秒杀活动商品库存
+     * @param stockDto
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result<Void> deductStock(StockDto stockDto) {
+        if (stockDto == null
+                || stockDto.getActivityId() == null
+                || stockDto.getProductId() == null
+                || stockDto.getSpecId() == null) {
+            throw new BusinessException("扣减秒杀库存参数不完整");
+        }
+
+        String redisStockKey = SeckillRedisKeyConstants.SECKILL_NUM_KEY_PREFIX
+                + stockDto.getActivityId() + ":" + stockDto.getProductId() + ":" + stockDto.getSpecId();
+
+        // 条件更新 + 原子减1，避免超卖
+        boolean update = lambdaUpdate()
+                .eq(Stock::getActivityId, stockDto.getActivityId())
+                .eq(Stock::getProductId, stockDto.getProductId())
+                .eq(Stock::getProductSpecId, stockDto.getSpecId())
+                .gt(Stock::getAvailableStock, 0)
+                .setSql("available_stock = available_stock - 1")
+                .update();
+        if (!update) {
+            // DB扣减失败时回补Redis库存（前提：上游流程已扣过Redis）
+            stringRedisTemplate.opsForValue().increment(redisStockKey, 1);
+            throw new BusinessException("扣减秒杀库存失败或库存不足");
+        }
+        return Result.success();
     }
 
     /**

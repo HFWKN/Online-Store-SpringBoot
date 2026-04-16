@@ -119,18 +119,39 @@ public class UserAddressController {
 
 
     /**
-     *  根据地址id查询地址信息
+     *  根据地址id查询地址信息 --- 普通请求
      * @param addressId
      * @return
      */
     @GetMapping("/selectByAddressId/{addressId}")
     @Operation(summary = "根据地址id查询地址")
     public Result<UserAddressVo> selectByAddressId(@PathVariable Long addressId){
+        // 普通请求从用户context中获取userId
+        Long userId = UserContext.getUserId();
+        if (userId == null) {
+            throw new BusinessException("用户未登录");
+        }
+        return selectByAddressIdAndUserId(addressId, userId);
+    }
+
+    /**
+     *  根据地址id和用户id查询地址信息（服务间调用）
+     * @param addressId 地址id
+     * @param userId 用户id
+     * @return 地址信息
+     */
+    @GetMapping("/selectByAddressId/{addressId}/byUser")
+    @Operation(summary = "根据地址id和用户id查询地址")
+    public Result<UserAddressVo> selectByAddressIdAndUserId(@PathVariable Long addressId,
+                                                             @RequestParam Long userId){
         UserAddress address = userAddressService.lambdaQuery()
                 .eq(UserAddress::getId, addressId)
-                .eq(UserAddress::getUserid, UserContext.getUserId())
+                .eq(UserAddress::getUserid, userId)
                 .eq(UserAddress::getIsDelete, 0)
                 .one();
+        if (address == null) {
+            throw new BusinessException("收货地址不存在或无权限访问");
+        }
         UserAddressVo vo = new UserAddressVo();
         BeanUtil.copyProperties(address,vo);
         return Result.success(vo);

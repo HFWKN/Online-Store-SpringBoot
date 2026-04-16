@@ -1,5 +1,6 @@
 package com.liubingqi.order.service;
 
+import com.liubingqi.common.domain.mq.SeckillOrderMessage;
 import com.liubingqi.order.domain.dto.CreateOrderDto;
 import com.liubingqi.order.domain.po.Order;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -25,4 +26,7 @@ public interface IOrderService extends IService<Order> {
 
     // 查询当前用户的所有订单
     //List<OrderVo> selectAll(Integer status);
+
+    // 下单-MQ
+    String createOrderFromMq(SeckillOrderMessage order);
 }

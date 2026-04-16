@@ -50,6 +50,8 @@ public class OrderItemServiceImpl extends ServiceImpl<OrderItemMapper, OrderItem
                 .eq(OrderItem::getUserId, userId)
                 .eq(status != null, OrderItem::getStatus, status)
                 .like(productName != null, OrderItem::getProductName, productName)
+                // 根据id倒叙
+                .orderByDesc(OrderItem::getId)
                 .list();
         // 如果订单列表为空，则返回空
         if(CollectionUtil.isEmpty(list)){

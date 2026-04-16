@@ -21,4 +21,7 @@ public interface IStockService extends IService<Stock> {
 
     // 预热活动商品的规格库存到 Redis
     Result<Void> getStockNum(StockDto stockDto);
+
+    // 扣减秒杀活动商品库存
+    Result<Void> deductStock(StockDto stockDto);
 }

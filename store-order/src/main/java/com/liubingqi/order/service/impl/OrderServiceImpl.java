@@ -3,10 +3,13 @@ package com.liubingqi.order.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateTime;
 import com.liubingqi.common.domain.Result;
+import com.liubingqi.common.domain.mq.SeckillOrderMessage;
 import com.liubingqi.common.exception.BusinessException;
 import com.liubingqi.common.feignClient.product.ProductFeignClient;
 import com.liubingqi.common.feignClient.product.vo.ProductSpecVo;
 import com.liubingqi.common.feignClient.product.vo.ProductVo;
+import com.liubingqi.common.feignClient.seckill.SeckillFeignClient;
+import com.liubingqi.common.feignClient.seckill.dto.StockDto;
 import com.liubingqi.common.feignClient.user.UserFeignClient;
 import com.liubingqi.common.feignClient.user.vo.UserAddressVo;
 import com.liubingqi.common.utils.UserContext;
@@ -50,6 +53,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final ProductFeignClient productFeignClient;
     private final UserFeignClient userFeignClient;
     private final OrderItemMapper orderItemMapper;
+    private final SeckillFeignClient seckillFeignClient;
 
 
     /**
@@ -81,11 +85,81 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         String key = OrderRedisKeyConstants.ORDER_TOKEN_KEY_PREFIX + userId;
         // 先查询redis中是否有此次下单
         Long result = stringRedisTemplate.execute(OrderLuaScriptConstants.CHECK_AND_DELETE_ORDER_TOKEN_SCRIPT, Collections.singletonList(key), orderToken);
-        if (result == null || result == 0L) {
+        if (result == 0L) {
             throw new BusinessException("请勿重复提交或下单已失效");
         }
-        // 创建订单
-        //List<Order> orderList = new ArrayList<>();
+        // 调用下单方法，生成订单
+        return createOrderCore(dto, userId);
+    }
+
+
+    /**
+     *  下单 - MQ
+     * @param order
+     * @return
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String createOrderFromMq(SeckillOrderMessage order) {
+        if (order == null) {
+            throw new BusinessException("消息为空");
+        }
+        if (order.getUserId() == null) {
+            throw new BusinessException("消息缺少用户信息");
+        }
+        if (order.getAddressId() == null) {
+            throw new BusinessException("消息缺少地址信息");
+        }
+        if (CollectionUtil.isEmpty(order.getItems())) {
+            throw new BusinessException("消息缺少下单明细");
+        }
+
+        // 创建下单DTO
+        CreateOrderDto dto = new CreateOrderDto();
+        dto.setAddressId(order.getAddressId());
+        dto.setPayAmount(order.getPayAmount());
+        dto.setRemark(order.getRemark());
+
+        // 创建秒杀库存DTO
+        StockDto stockDto = new StockDto();
+
+        // 创建商品信息集合
+        List<CreateOrderDto.OrderItemDto> itemDtoList = new ArrayList<>(order.getItems().size());
+        for (SeckillOrderMessage.OrderItem sourceItem : order.getItems()) {
+            if (sourceItem == null || sourceItem.getProductId() == null || sourceItem.getSpecId() == null || sourceItem.getNum() == null) {
+                throw new BusinessException("消息明细参数不完整");
+            }
+            CreateOrderDto.OrderItemDto itemDto = new CreateOrderDto.OrderItemDto();
+            itemDto.setProductId(sourceItem.getProductId());
+            itemDto.setSpecId(sourceItem.getSpecId());
+            itemDto.setNum(sourceItem.getNum());
+            itemDtoList.add(itemDto);
+
+            // 往秒杀库存DTO中set数据
+            stockDto.setProductId(sourceItem.getProductId());
+            stockDto.setActivityId(order.getActivityId());
+            stockDto.setSpecId(sourceItem.getSpecId());
+        }
+        dto.setItems(itemDtoList);
+
+        // 调用生成订单方法
+        try {
+            createOrderCore(dto, order.getUserId());
+            // 远程调用，调用扣减秒杀库存的方法
+            seckillFeignClient.deductStock(stockDto);
+        }catch (Exception e){
+            throw new BusinessException("下单失败");
+        }
+        return "";
+    }
+
+    /**
+     *  生成订单信息 - 通用
+     * @param dto
+     * @param userId
+     * @return
+     */
+    private String createOrderCore(CreateOrderDto dto, Long userId) {
         // 订单编号
         String orderNo = "order_" + System.currentTimeMillis() + "_" + new Random().nextInt(10000);
         // 获取dto中的订单商品信息list(只存商品信息，无地址等)
@@ -98,8 +172,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
 
         // 根据地址id查询地址信息
-        Result<UserAddressVo> addressVoResult = userFeignClient.selectByAddressId(dto.getAddressId());
+        Result<UserAddressVo> addressVoResult = userFeignClient.selectByAddressIdAndUserId(dto.getAddressId(), userId);
         UserAddressVo addressVo = addressVoResult.getData();
+        if (addressVo == null) {
+            throw new BusinessException("收货地址不存在或无权限访问");
+        }
 
         // 收集dto中的规格id
         List<Long> specIds = new ArrayList<>();
@@ -117,13 +194,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         Map<Long, ProductSpecVo> specMap = new HashMap<>();
         for (ProductSpecVo s : specList) {
             specMap.put(Long.valueOf(s.getId()), s);
-        }
-        // 批量查询商品规格信息，根据规格id
-        List<CreateOrderDto.OrderItemDto> items = dto.getItems();
-        // 创建list，存规格id
-        List<Long> specIds1 = new ArrayList<>();
-        for (CreateOrderDto.OrderItemDto item : items) {
-            specIds1.add(item.getSpecId());
         }
 
         // 批量查询商品信息
@@ -203,6 +273,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         return "下单成功";
     }
+
     // 查询商品总价
     private BigDecimal getTotalAmount(List<CreateOrderDto.OrderItemDto> productInfos) {
         if (CollectionUtil.isEmpty(productInfos)) {
@@ -240,21 +311,4 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         }
         return totalAmount;
     }
-
-
-/*    *//**
-     *  查询当前用户的所有订单
-     * @return
-     *//*
-    @Override
-    public List<OrderVo> selectAll(Integer status) {
-        // 获取当前用户id
-        Long userId = UserContext.getUserId();
-        // 根据用户id查询订单主表信息
-        lambdaQuery()
-                .eq(Order::getUserId, userId)
-                .eq(status != null, Order::getStatus, status)
-
-        return null;
-    }*/
 }

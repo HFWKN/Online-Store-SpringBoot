@@ -52,4 +52,14 @@ public class StockController {
         return stockService.getStockNum(stockDto);
     }
 
+
+    /**
+     *  扣减秒杀活动商品库存
+     *  dto需要活动id，商品id，规格id，数量写死为1.
+     */
+    @PostMapping("/deductStock")
+    @Operation(summary = "扣减秒杀活动商品库存")
+    public Result<Void> deductStock(@RequestBody StockDto stockDto){
+        return stockService.deductStock(stockDto);
+    }
 }
