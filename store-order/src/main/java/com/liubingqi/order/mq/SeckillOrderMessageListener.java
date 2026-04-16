@@ -5,7 +5,9 @@ import com.liubingqi.common.domain.mq.SeckillOrderMessage;
 import com.liubingqi.order.service.IOrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.AmqpRejectAndDontRequeueException;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +21,12 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class SeckillOrderMessageListener {
 
-        private static final String MQ_KEY_PREFIX = "STOREMQ:";
+    private static final String MQ_KEY_PREFIX = "STOREMQ:";
+    private static final String RETRY_ONCE_KEY_PREFIX = "STOREMQ:RETRY_ONCE:";
 
-        private final StringRedisTemplate redisTemplate;
-        private final IOrderService orderService;
+    private final StringRedisTemplate redisTemplate;
+    private final IOrderService orderService;
+    private final RabbitTemplate rabbitTemplate;
 
     @RabbitListener(queues = MqConstants.SECKILL_ORDER_CREATE_QUEUE)
     public void onSeckillOrderMessage(SeckillOrderMessage message) {
@@ -46,9 +50,27 @@ public class SeckillOrderMessageListener {
             // 该messageId第一次通知消费者
             orderService.createOrderFromMq(message);
         } catch (Exception e) {
-            // 业务失败释放幂等占位，允许 MQ 重试
+            // 业务失败后只允许重试一次，超过一次则直接进入死信队列
+            log.error("秒杀下单失败,重试一次, messageId={}", message.getMessageId(), e);
+            String retryOnceKey = RETRY_ONCE_KEY_PREFIX + message.getMessageId();
+            Boolean firstRetry = redisTemplate.opsForValue()
+                    .setIfAbsent(retryOnceKey, "1", 24, TimeUnit.HOURS);
+
+            // 无论重试还是进入死信，先释放消费幂等占位，避免下一次被误判重复
             redisTemplate.delete(idempotentKey);
-            throw e;
+
+            if (Boolean.TRUE.equals(firstRetry)) {
+                log.warn("准备进行一次消费重试, messageId={}", message.getMessageId());
+                rabbitTemplate.convertAndSend(
+                        MqConstants.SECKILL_ORDER_EXCHANGE,
+                        MqConstants.SECKILL_ORDER_CREATE_ROUTING_KEY,
+                        message
+                );
+                return;
+            }
+
+            throw new AmqpRejectAndDontRequeueException(
+                    "消费失败且已重试一次，拒绝重回队列并进入死信队列, messageId=" + message.getMessageId(), e);
         }
     }
 }

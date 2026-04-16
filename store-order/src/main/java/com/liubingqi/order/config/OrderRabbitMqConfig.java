@@ -10,6 +10,9 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 订单服务 MQ 配置（消费者侧）
  */
@@ -22,8 +25,21 @@ public class OrderRabbitMqConfig {
     }
 
     @Bean
+    public TopicExchange seckillOrderDeadExchange() {
+        return new TopicExchange(MqConstants.SECKILL_ORDER_DEAD_EXCHANGE, true, false);
+    }
+
+    @Bean
     public Queue seckillOrderCreateQueue() {
-        return new Queue(MqConstants.SECKILL_ORDER_CREATE_QUEUE, true);
+        Map<String, Object> args = new HashMap<>();
+        args.put("x-dead-letter-exchange", MqConstants.SECKILL_ORDER_DEAD_EXCHANGE);
+        args.put("x-dead-letter-routing-key", MqConstants.SECKILL_ORDER_DEAD_ROUTING_KEY);
+        return new Queue(MqConstants.SECKILL_ORDER_CREATE_QUEUE, true, false, false, args);
+    }
+
+    @Bean
+    public Queue seckillOrderDeadQueue() {
+        return new Queue(MqConstants.SECKILL_ORDER_DEAD_QUEUE, true);
     }
 
     @Bean
@@ -32,6 +48,14 @@ public class OrderRabbitMqConfig {
                 .bind(seckillOrderCreateQueue)
                 .to(seckillOrderExchange)
                 .with(MqConstants.SECKILL_ORDER_CREATE_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding seckillOrderDeadBinding(Queue seckillOrderDeadQueue, TopicExchange seckillOrderDeadExchange) {
+        return BindingBuilder
+                .bind(seckillOrderDeadQueue)
+                .to(seckillOrderDeadExchange)
+                .with(MqConstants.SECKILL_ORDER_DEAD_ROUTING_KEY);
     }
 
     /**
