@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 @Data
 public class StoreMessageVo {
 
+    @Schema(description = "消息ID")
+    private Long id;
+
     @Schema(description = "商品名称")
     private String productName;
 

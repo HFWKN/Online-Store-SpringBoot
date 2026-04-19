@@ -6,6 +6,7 @@ import com.liubingqi.common.feignClient.product.ProductFeignClient;
 import com.liubingqi.common.feignClient.product.vo.ProductSpecVo;
 import com.liubingqi.common.feignClient.product.vo.ProductVo;
 import com.liubingqi.common.utils.UserContext;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.liubingqi.order.domain.po.StoreMessage;
 import com.liubingqi.order.domain.vo.StoreMessageVo;
@@ -34,7 +35,7 @@ public class MessageServiceImpl extends ServiceImpl<StoreMessageMapper, StoreMes
      * @return
      */
     @Override
-    public Result<String> sendMessage(SeckillOrderMessage message) {
+    public Result<Void> saveMessage(SeckillOrderMessage message) {
         if (message == null || message.getItems() == null || message.getItems().isEmpty()) {
             return Result.fail("消息体为空，无法生成通知");
         }
@@ -83,7 +84,7 @@ public class MessageServiceImpl extends ServiceImpl<StoreMessageMapper, StoreMes
 
         this.save(messageEntity);
 
-        return Result.success(content);
+        return Result.success();
 
     }
 
@@ -93,15 +94,30 @@ public class MessageServiceImpl extends ServiceImpl<StoreMessageMapper, StoreMes
      * @return
      */
     @Override
-    public Result<List<StoreMessageVo>> getByUserId() {
+    public Result<List<StoreMessageVo>> getByUserId(LocalDateTime lastTime, Long lastId, Integer limit) {
         Long userId = UserContext.getUserId();
         if (userId == null){
             return Result.unauthorized();
         }
-        List<StoreMessage> messageList = lambdaQuery()
-                .eq(StoreMessage::getUserId, userId)
-                .orderByDesc(StoreMessage::getCreateTime)
-                .list();
+        // 策略B：首次不返回历史消息，前端应传当前时间作为游标后再轮询增量。
+        if (lastTime == null) {
+            return Result.success(Collections.emptyList());
+        }
+
+        int pageSize = normalizeLimit(limit);
+        LambdaQueryWrapper<StoreMessage> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(StoreMessage::getUserId, userId);
+        if (lastId != null && lastId > 0) {
+            queryWrapper.and(w -> w.gt(StoreMessage::getCreateTime, lastTime)
+                    .or(ow -> ow.eq(StoreMessage::getCreateTime, lastTime)
+                            .gt(StoreMessage::getId, lastId)));
+        } else {
+            queryWrapper.gt(StoreMessage::getCreateTime, lastTime);
+        }
+        queryWrapper.orderByAsc(StoreMessage::getCreateTime)
+                .orderByAsc(StoreMessage::getId)
+                .last("LIMIT " + pageSize);
+        List<StoreMessage> messageList = list(queryWrapper);
 
         if (messageList == null || messageList.isEmpty()) {
             return Result.success(Collections.emptyList());
@@ -110,6 +126,7 @@ public class MessageServiceImpl extends ServiceImpl<StoreMessageMapper, StoreMes
         ArrayList<StoreMessageVo> storeMessageVos = new ArrayList<>(messageList.size());
         for (StoreMessage item : messageList) {
             StoreMessageVo vo = new StoreMessageVo();
+            vo.setId(item.getId());
             vo.setProductName(item.getProductName());
             vo.setSpecName(item.getSpecName());
             vo.setContent(item.getContent());
@@ -117,5 +134,40 @@ public class MessageServiceImpl extends ServiceImpl<StoreMessageMapper, StoreMes
             storeMessageVos.add(vo);
         }
         return Result.success(storeMessageVos);
+    }
+
+
+    /**
+     *  查询所有消息
+     * @return
+     */
+    @Override
+    public Result<List<StoreMessageVo>> getAll() {
+        Long userId = UserContext.getUserId();
+        List<StoreMessage> list = lambdaQuery()
+                .eq(StoreMessage::getUserId, userId)
+                .orderByDesc(StoreMessage::getCreateTime)
+                .list();
+        if (list == null || list.isEmpty()) {
+            return Result.success(Collections.emptyList());
+        }
+        ArrayList<StoreMessageVo> storeMessageVos = new ArrayList<>(list.size());
+        for (StoreMessage item : list) {
+            StoreMessageVo vo = new StoreMessageVo();
+            vo.setId(item.getId());
+            vo.setProductName(item.getProductName());
+            vo.setSpecName(item.getSpecName());
+            vo.setContent(item.getContent());
+            vo.setCreateTime(item.getCreateTime());
+            storeMessageVos.add(vo);
+        }
+        return Result.success(storeMessageVos);
+    }
+
+    private int normalizeLimit(Integer limit) {
+        if (limit == null || limit <= 0) {
+            return 50;
+        }
+        return Math.min(limit, 200);
     }
 }

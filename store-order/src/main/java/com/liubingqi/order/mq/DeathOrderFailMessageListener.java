@@ -42,10 +42,17 @@ public class DeathOrderFailMessageListener {
             seckillFeignClient.compensateStock(message);
         } catch (Exception e) {
             log.error("死信补偿调用失败, messageId={}", message.getMessageId(), e);
-            throw e;
+            //throw e;
         }
-
-        // 再给前端发送失败通知
-        messageService.sendMessage(message);
+        /**
+         *  上面不能抛异常，否则下面不会继续执行，导致失败消息没有入库
+         */
+        // 把失败信息写入库
+        try {
+            messageService.saveMessage(message);
+        } catch (Exception e) {
+            // 通知写库失败不再抛异常，避免同一条死信被无限重投导致日志刷屏。
+            log.error("发送失败通知异常，已跳过重试, messageId={}", message.getMessageId(), e);
+        }
     }
 }

@@ -204,9 +204,6 @@ public class StockServiceImpl extends ServiceImpl<StockMapper, Stock> implements
             throw new BusinessException("扣减秒杀库存参数不完整");
         }
 
-        String redisStockKey = SeckillRedisKeyConstants.SECKILL_NUM_KEY_PREFIX
-                + stockDto.getActivityId() + ":" + stockDto.getProductId() + ":" + stockDto.getSpecId();
-
         // 条件更新 + 原子减1，避免超卖
         boolean update = lambdaUpdate()
                 .eq(Stock::getActivityId, stockDto.getActivityId())
@@ -216,8 +213,8 @@ public class StockServiceImpl extends ServiceImpl<StockMapper, Stock> implements
                 .setSql("available_stock = available_stock - 1")
                 .update();
         if (!update) {
-            // DB扣减失败时回补Redis库存（前提：上游流程已扣过Redis）
-            stringRedisTemplate.opsForValue().increment(redisStockKey, 1);
+            // 单点补偿策略：此处只抛异常，不在这里回补 Redis。
+            // Redis 回补统一由死信补偿 compensateStock() 执行，避免重复回补。
             throw new BusinessException("扣减秒杀库存失败或库存不足");
         }
         return Result.success();
@@ -235,6 +232,7 @@ public class StockServiceImpl extends ServiceImpl<StockMapper, Stock> implements
      *    - 作用：用户限购占位 key，补偿时删除，允许用户重新下单。
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Result<Void> compensateStock(SeckillOrderMessage message) {
         if (message == null || message.getMessageId() == null || message.getMessageId().isBlank()) {
             throw new BusinessException("死信补偿参数不完整");
@@ -275,7 +273,7 @@ public class StockServiceImpl extends ServiceImpl<StockMapper, Stock> implements
         } catch (Exception e) {
             // 补偿失败时释放幂等占位，允许后续重试
             stringRedisTemplate.delete(compensateKey);
-            throw new BusinessException("死信补偿执行失败");
+            throw new BusinessException("死信补偿执行失败: " + e.getMessage());
         }
     }
 

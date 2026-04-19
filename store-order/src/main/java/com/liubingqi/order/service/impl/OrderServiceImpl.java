@@ -143,7 +143,12 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
 
         // 调用生成订单方法
         try {
+            // 调用生成订单方法
             createOrderCore(dto, order.getUserId());
+/*            if(order != null){
+                // 测试用：强制失败，观察是否进入死信并写通知
+                throw new BusinessException("测试异常：扣库存后强制失败");
+            }*/
             // 远程调用，调用扣减秒杀库存的方法
             seckillFeignClient.deductStock(stockDto);
         }catch (Exception e){
