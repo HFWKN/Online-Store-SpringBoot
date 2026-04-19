@@ -2,8 +2,8 @@ package com.liubingqi.common.feignClient.seckill;
 
 
 import com.liubingqi.common.domain.Result;
+import com.liubingqi.common.domain.mq.SeckillOrderMessage;
 import com.liubingqi.common.feignClient.seckill.dto.StockDto;
-import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,4 +17,10 @@ public interface SeckillFeignClient {
      */
     @PostMapping("/deductStock")
     Result<Void> deductStock(@RequestBody StockDto stockDto);
+
+    /**
+     * 死信补偿：回补秒杀库存并释放限购占位
+     */
+    @PostMapping("/compensateStock")
+    Result<Void> compensateStock(@RequestBody SeckillOrderMessage message);
 }

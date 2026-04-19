@@ -41,6 +41,12 @@ public class SeckillRedisKeyConstants {
      */
     public static final String SECKILL_BUY_COUNT_KEY_PREFIX = "online:store:seckill:buy_count:";
 
+    /**
+     * 秒杀死信补偿幂等 Key 前缀
+     * 实际使用: SECKILL_COMPENSATE_KEY_PREFIX + messageId
+     */
+    public static final String SECKILL_COMPENSATE_KEY_PREFIX = "online:store:seckill:compensate:";
+
 
     ///  ---------------分布式锁Key------------------
 
@@ -58,6 +64,11 @@ public class SeckillRedisKeyConstants {
      *  用在商品规格缓存回填上，作用是防缓存击穿：缓存 miss 时只让一个线程查库+回填，其他线程等待/兜底。
      */
     public static final String SECKILL_SPEC_LOCK_KEY_PREFIX = "online:store:seckill:lock:spec:";
+
+    /**
+     * Outbox 派发任务锁 Key，保证同一时刻只由一个实例执行派发任务。
+     */
+    public static final String SECKILL_OUTBOX_DISPATCH_LOCK_KEY = "online:store:seckill:lock:outbox:dispatch";
 
     private SeckillRedisKeyConstants() {
     }

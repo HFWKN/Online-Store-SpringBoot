@@ -2,6 +2,7 @@ package com.liubingqi.seckill.controller;
 
 
 import com.liubingqi.common.domain.Result;
+import com.liubingqi.common.domain.mq.SeckillOrderMessage;
 import com.liubingqi.seckill.domain.dto.StockDto;
 import com.liubingqi.seckill.domain.vo.StockVo;
 import com.liubingqi.seckill.service.IStockService;
@@ -61,5 +62,14 @@ public class StockController {
     @Operation(summary = "扣减秒杀活动商品库存")
     public Result<Void> deductStock(@RequestBody StockDto stockDto){
         return stockService.deductStock(stockDto);
+    }
+
+    /**
+     * 死信补偿：回补秒杀库存并释放限购占位
+     */
+    @PostMapping("/compensateStock")
+    @Operation(summary = "死信补偿秒杀库存")
+    public Result<Void> compensateStock(@RequestBody SeckillOrderMessage message) {
+        return stockService.compensateStock(message);
     }
 }

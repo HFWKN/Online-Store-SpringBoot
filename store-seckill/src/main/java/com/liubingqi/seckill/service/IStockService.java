@@ -1,6 +1,7 @@
 package com.liubingqi.seckill.service;
 
 import com.liubingqi.common.domain.Result;
+import com.liubingqi.common.domain.mq.SeckillOrderMessage;
 import com.liubingqi.seckill.domain.dto.StockDto;
 import com.liubingqi.seckill.domain.po.Stock;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -24,4 +25,7 @@ public interface IStockService extends IService<Stock> {
 
     // 扣减秒杀活动商品库存
     Result<Void> deductStock(StockDto stockDto);
+
+    // 死信补偿：回补秒杀 Redis 库存并释放限购占位
+    Result<Void> compensateStock(SeckillOrderMessage message);
 }

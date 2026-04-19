@@ -2,6 +2,7 @@ package com.liubingqi.order.mq;
 
 import com.liubingqi.common.constants.MqConstants;
 import com.liubingqi.common.domain.mq.SeckillOrderMessage;
+import com.liubingqi.common.feignClient.seckill.SeckillFeignClient;
 import com.liubingqi.order.service.IMessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 public class DeathOrderFailMessageListener {
 
     private final IMessageService messageService;
+    private final SeckillFeignClient seckillFeignClient;
 
     /**
      * 监听死信队列
@@ -35,7 +37,15 @@ public class DeathOrderFailMessageListener {
                 message.getAddressId(),
                 message.getItems() == null ? 0 : message.getItems().size());
 
-        // 调用通知前端方法。
+        try {
+            // 先进行库存补偿与限购占位释放
+            seckillFeignClient.compensateStock(message);
+        } catch (Exception e) {
+            log.error("死信补偿调用失败, messageId={}", message.getMessageId(), e);
+            throw e;
+        }
+
+        // 再给前端发送失败通知
         messageService.sendMessage(message);
     }
 }

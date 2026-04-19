@@ -1,16 +1,20 @@
 package com.liubingqi.seckill.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.liubingqi.common.domain.Result;
 import com.liubingqi.common.domain.mq.SeckillOrderMessage;
 import com.liubingqi.common.utils.UserContext;
+import com.liubingqi.seckill.constants.OutboxStatus;
 import com.liubingqi.seckill.constants.Result_Code;
 import com.liubingqi.seckill.constants.SeckillRedisKeyConstants;
 import com.liubingqi.seckill.domain.dto.SeckillCreateOrderDto;
 import com.liubingqi.seckill.domain.dto.StockDto;
 import com.liubingqi.seckill.domain.po.Activity;
+import com.liubingqi.seckill.domain.po.OutboxMessage;
 import com.liubingqi.seckill.domain.vo.CodeInfoVo;
 import com.liubingqi.seckill.mq.SeckillOrderMessageSender;
 import com.liubingqi.seckill.service.IActivityService;
+import com.liubingqi.seckill.service.IOutboxMessageService;
 import com.liubingqi.seckill.service.IStockOrderService;
 import com.liubingqi.seckill.utils.CodeInfoUtils;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +35,7 @@ public class StockOrderServiceImpl implements IStockOrderService {
     private final StringRedisTemplate stringRedisTemplate;
     private final IActivityService activityService;
     private final SeckillOrderMessageSender mqSender;
-
+    private final IOutboxMessageService outboxService;
     /**
      * 扣减库存-redis-mq通知订单服务生成订单
      *
@@ -96,8 +100,7 @@ public class StockOrderServiceImpl implements IStockOrderService {
             return CodeInfoUtils.of(Result_Code.FAIL);// 下单失败，重新点击购买试试呢^_^。前端需要重新获取token
         }
         if (remainStock >= 0) {
-            // 2. 扣减成功
-            // 异步发送消息给MQ
+            // 2. 扣减成功，写入 Outbox 本地消息表，后续由定时任务派发到 MQ
             SeckillOrderMessage message = new SeckillOrderMessage();
             message.setMessageId(UUID.randomUUID().toString());// 消息唯一标识
             message.setUserId(UserContext.getUserId());// 用户 ID
@@ -113,16 +116,38 @@ public class StockOrderServiceImpl implements IStockOrderService {
             item.setNum(1); // 购买数量
             // 添加商品明细
             message.setItems(List.of(item));
-        try {
-            // 发送消息
-            mqSender.sendCreateOrderMessage(message);
-        }catch (Exception e){
-            // 如果发送消息失败，把库存加回去
-            stringRedisTemplate.opsForValue().increment(key);
-            // 发送失败回滚限购占位，允许用户重试
-            stringRedisTemplate.delete(buyKey);
-            return CodeInfoUtils.of(Result_Code.FAIL);// 下单失败，重新点击购买试试呢^_^ .前端重新获取token
-        }
+
+            // 创建 OutboxMessage，用于存储消息，待 MQ 消费
+            OutboxMessage outbox = new OutboxMessage()
+                    .setMessageId(message.getMessageId())
+                    .setPayloadJson(JSON.toJSONString(message))
+                    .setStatus(OutboxStatus.NEW)
+                    .setRetryCount(0)
+                    .setCreateTime(LocalDateTime.now())
+                    .setUpdateTime(LocalDateTime.now());
+
+/*            // 2. 扣减成功
+            // 发送消息给MQ
+            outboxService.save(outbox);
+            try {
+                // 发送消息
+                //mqSender.sendCreateOrderMessage(message);
+            }catch (Exception e){
+                // 如果发送消息失败，把库存加回去
+                stringRedisTemplate.opsForValue().increment(key);
+                // 发送失败回滚限购占位，允许用户重试
+                stringRedisTemplate.delete(buyKey);
+                return CodeInfoUtils.of(Result_Code.FAIL);// 下单失败，重新点击购买试试呢^_^ .前端重新获取token
+            }*/
+
+            try {
+                outboxService.save(outbox);
+            } catch (Exception e) {
+                // 写 Outbox 失败，回滚 Redis 库存和限购占位，允许用户重试
+                stringRedisTemplate.opsForValue().increment(key);
+                stringRedisTemplate.delete(buyKey);
+                return CodeInfoUtils.of(Result_Code.FAIL);
+            }
             // 扣减成功，返回成功结果
             return CodeInfoUtils.of(Result_Code.SUCCESS); // 下单成功
         } else {

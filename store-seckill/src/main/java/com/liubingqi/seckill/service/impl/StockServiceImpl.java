@@ -3,11 +3,11 @@ package com.liubingqi.seckill.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.liubingqi.common.domain.Result;
+import com.liubingqi.common.domain.mq.SeckillOrderMessage;
 import com.liubingqi.common.exception.BusinessException;
 import com.liubingqi.common.feignClient.product.ProductFeignClient;
 import com.liubingqi.common.feignClient.product.vo.ProductSpecVo;
 import com.liubingqi.seckill.constants.SeckillRedisKeyConstants;
-import com.liubingqi.seckill.constants.SpecNum;
 import com.liubingqi.seckill.domain.dto.StockDto;
 import com.liubingqi.seckill.domain.po.Activity;
 import com.liubingqi.seckill.domain.po.Stock;
@@ -221,6 +221,62 @@ public class StockServiceImpl extends ServiceImpl<StockMapper, Stock> implements
             throw new BusinessException("扣减秒杀库存失败或库存不足");
         }
         return Result.success();
+    }
+
+    /**
+     * 死信补偿：回补 Redis 预扣库存并释放限购占位。
+     *
+     * Key 说明：
+     * 1) compensateKey = online:store:seckill:compensate:{messageId}
+     *    - 作用：补偿幂等锁，同一条死信消息只补偿一次。
+     * 2) stockKey = online:store:seckill:num:{activityId}:{productId}:{specId}
+     *    - 作用：秒杀 Redis 库存 key，补偿时执行 INCR 回加库存。
+     * 3) buyKey = online:store:seckill:buy_count:{activityId}:{productId}:{specId}:{userId}
+     *    - 作用：用户限购占位 key，补偿时删除，允许用户重新下单。
+     */
+    @Override
+    public Result<Void> compensateStock(SeckillOrderMessage message) {
+        if (message == null || message.getMessageId() == null || message.getMessageId().isBlank()) {
+            throw new BusinessException("死信补偿参数不完整");
+        }
+        if (message.getUserId() == null || message.getActivityId() == null || CollectionUtil.isEmpty(message.getItems())) {
+            throw new BusinessException("死信补偿消息缺少核心字段");
+        }
+        SeckillOrderMessage.OrderItem item = message.getItems().get(0);
+        if (item == null || item.getProductId() == null || item.getSpecId() == null) {
+            throw new BusinessException("死信补偿商品字段不完整");
+        }
+
+        Integer num = item.getNum();
+        if (num == null || num <= 0) {
+            num = 1;
+        }
+
+        // 幂等锁：同 messageId 只允许补偿一次，防止死信重复投递导致“多补库存”
+        String compensateKey = SeckillRedisKeyConstants.SECKILL_COMPENSATE_KEY_PREFIX + message.getMessageId();
+        Boolean firstCompensate = stringRedisTemplate.opsForValue()
+                .setIfAbsent(compensateKey, "1", 24, TimeUnit.HOURS);
+        if (Boolean.FALSE.equals(firstCompensate)) {
+            return Result.success();
+        }
+
+        // 秒杀 Redis 库存 key：online:store:seckill:num:{activityId}:{productId}:{specId}
+        String stockKey = SeckillRedisKeyConstants.SECKILL_NUM_KEY_PREFIX
+                + message.getActivityId() + ":" + item.getProductId() + ":" + item.getSpecId();
+        // 限购占位 key：online:store:seckill:buy_count:{activityId}:{productId}:{specId}:{userId}
+        String buyKey = SeckillRedisKeyConstants.SECKILL_BUY_COUNT_KEY_PREFIX
+                + message.getActivityId() + ":" + item.getProductId() + ":" + item.getSpecId() + ":" + message.getUserId();
+
+        try {
+            // 回补库存并释放限购占位
+            stringRedisTemplate.opsForValue().increment(stockKey, num);
+            stringRedisTemplate.delete(buyKey);
+            return Result.success();
+        } catch (Exception e) {
+            // 补偿失败时释放幂等占位，允许后续重试
+            stringRedisTemplate.delete(compensateKey);
+            throw new BusinessException("死信补偿执行失败");
+        }
     }
 
     /**

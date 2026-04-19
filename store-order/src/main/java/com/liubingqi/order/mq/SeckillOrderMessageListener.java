@@ -21,7 +21,16 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class SeckillOrderMessageListener {
 
+    /**
+     * 消费幂等 key 前缀（同一 messageId 只允许成功处理一次）
+     * 实际使用: STOREQ_KEY_PREFIX + messageId
+     */
     private static final String MQ_KEY_PREFIX = "STOREMQ:";
+
+    /**
+     * 消费重试次数控制 key 前缀（当前策略：每条消息最多补发重试一次）
+     * 实际使用: RETRY_ONCE_KEY_PREFIX + messageId
+     */
     private static final String RETRY_ONCE_KEY_PREFIX = "STOREMQ:RETRY_ONCE:";
 
     private final StringRedisTemplate redisTemplate;
