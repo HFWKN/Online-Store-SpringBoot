@@ -18,9 +18,11 @@ import com.liubingqi.order.constants.OrderRedisKeyConstants;
 import com.liubingqi.order.domain.dto.CreateOrderDto;
 import com.liubingqi.order.domain.po.Order;
 import com.liubingqi.order.domain.po.OrderItem;
+import com.liubingqi.order.domain.po.StoreMessage;
 import com.liubingqi.order.domain.vo.OrderVo;
 import com.liubingqi.order.mapper.OrderItemMapper;
 import com.liubingqi.order.mapper.OrderMapper;
+import com.liubingqi.order.service.IMessageService;
 import com.liubingqi.order.service.IOrderItemService;
 import com.liubingqi.order.service.IOrderService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -53,6 +55,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
     private final UserFeignClient userFeignClient;
     private final OrderItemMapper orderItemMapper;
     private final SeckillFeignClient seckillFeignClient;
+    private final IMessageService messageService;
 
 
     /**
@@ -145,10 +148,10 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
         try {
             // 调用生成订单方法
             createOrderCore(dto, order.getUserId());
-/*            if(order != null){
+            if(order != null){
                 // 测试用：强制失败，观察是否进入死信并写通知
                 throw new BusinessException("测试异常：扣库存后强制失败");
-            }*/
+            }
             // 远程调用，调用扣减秒杀库存的方法
             seckillFeignClient.deductStock(stockDto);
         }catch (Exception e){
@@ -275,6 +278,15 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 throw new BusinessException("订单明细插入失败");
             }
         }
+        // 下单成功，往信息表插入信息
+        StoreMessage storeMessage = new StoreMessage();
+        storeMessage.setContent("下单成功,请前往“我的订单”界面查看详细");
+        storeMessage.setUserId(userId);
+        storeMessage.setProductName("");
+        storeMessage.setSpecName("");
+        storeMessage.setCreateTime(LocalDateTime.now());
+        storeMessage.setUpdateTime(LocalDateTime.now());
+        messageService.save(storeMessage);
         return "下单成功";
     }
 
