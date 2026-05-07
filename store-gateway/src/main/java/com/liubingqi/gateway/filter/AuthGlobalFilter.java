@@ -41,8 +41,9 @@ public class AuthGlobalFilter implements GlobalFilter, Ordered {
             "/user/register",
             "/user/captcha",
             "/product/list",
-            "/product/detail"
-            //"/product/page"
+            "/product/detail",
+            "/product/page",
+            "/product/category/list"
     );
 
     @Override

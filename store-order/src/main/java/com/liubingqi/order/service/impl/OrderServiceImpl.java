@@ -278,16 +278,49 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Order> implements
                 throw new BusinessException("订单明细插入失败");
             }
         }
+        LinkedHashSet<String> messageProductNames = new LinkedHashSet<>();
+        LinkedHashSet<String> messageSpecNames = new LinkedHashSet<>();
+        for (CreateOrderDto.OrderItemDto item : productInfos) {
+            ProductVo product = productMap.get(item.getProductId());
+            if (product != null && product.getName() != null && !product.getName().isBlank()) {
+                messageProductNames.add(product.getName());
+            } else {
+                messageProductNames.add("商品");
+            }
+            ProductSpecVo spec1 = specMap.get(item.getSpecId());
+            messageSpecNames.add(buildSpecName(spec1));
+        }
+        String messageProductName = String.join("、", messageProductNames);
+        String messageSpecName = String.join("、", messageSpecNames);
+
         // 下单成功，往信息表插入信息
         StoreMessage storeMessage = new StoreMessage();
         storeMessage.setContent("下单成功,请前往“我的订单”界面查看详细");
         storeMessage.setUserId(userId);
-        storeMessage.setProductName("");
-        storeMessage.setSpecName("");
+        storeMessage.setProductName(messageProductName);
+        storeMessage.setSpecName(messageSpecName);
         storeMessage.setCreateTime(LocalDateTime.now());
         storeMessage.setUpdateTime(LocalDateTime.now());
         messageService.save(storeMessage);
         return "下单成功";
+    }
+
+    private String buildSpecName(ProductSpecVo spec) {
+        if (spec == null) {
+            return "默认规格";
+        }
+        String color = spec.getColor() == null ? "" : spec.getColor().trim();
+        String productSpec = spec.getProductSpec() == null ? "" : spec.getProductSpec().trim();
+        if (!color.isEmpty() && !productSpec.isEmpty()) {
+            return color + "-" + productSpec;
+        }
+        if (!productSpec.isEmpty()) {
+            return productSpec;
+        }
+        if (!color.isEmpty()) {
+            return color;
+        }
+        return "默认规格";
     }
 
     // 查询商品总价
