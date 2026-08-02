@@ -77,7 +77,7 @@ public class SeckillOrderMessageListener {
                 );
                 return;
             }
-
+            // 拒绝重回队列并进入死信队列
             throw new AmqpRejectAndDontRequeueException(
                     "消费失败且已重试一次，拒绝重回队列并进入死信队列, messageId=" + message.getMessageId(), e);
         }

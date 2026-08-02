@@ -16,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * 秒杀下单消息发送器
+ *
+ *      MQ 生产者端，用于发送秒杀下单消息
  */
 @Slf4j
 @Component
@@ -71,6 +73,7 @@ public class SeckillOrderMessageSender {
         returnReasonMap.remove(messageId);
         CorrelationData correlationData = new CorrelationData(messageId);
 
+        // 向 MQ 发送消息
         rabbitTemplate.convertAndSend(
                 MqConstants.SECKILL_ORDER_EXCHANGE,
                 MqConstants.SECKILL_ORDER_CREATE_ROUTING_KEY,
@@ -84,6 +87,7 @@ public class SeckillOrderMessageSender {
         );
 
         try {
+            // 等待 confirm
             CorrelationData.Confirm confirm = correlationData.getFuture()
                     .get(CONFIRM_TIMEOUT_SECONDS, TimeUnit.SECONDS);
             boolean ack = confirm != null && confirm.isAck();

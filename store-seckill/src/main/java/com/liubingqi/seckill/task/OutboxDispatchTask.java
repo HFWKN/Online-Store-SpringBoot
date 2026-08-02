@@ -73,7 +73,7 @@ public class OutboxDispatchTask {
                     if (message == null || message.getMessageId() == null) {
                         throw new IllegalStateException("payload 无法反序列化为有效消息");
                     }
-                    // 向mq发送信息
+                    // 调用自定义mq类(mqSender)向mq发送信息
                     // V2：向mq发送信息后必须以 confirm/return 结果判定是否成功，不能仅靠“未抛异常”。
                     SeckillOrderMessageSender.SendResult sendResult = mqSender.sendCreateOrderMessageWithConfirm(message);
                     if (!sendResult.success()) {
